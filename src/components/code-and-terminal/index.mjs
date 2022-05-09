@@ -5,16 +5,9 @@ import {fromParse5} from 'hast-util-from-parse5'
 import {visit, SKIP} from 'unist-util-visit'
 import {toHtml} from 'hast-util-to-html'
 
-let count = 0;
-
-const Collapse = (properties, children) => {
-    const file = readSync('./polyscribe-canvas/src/components/collapse/index.html')
-    let blob = String(file)
-    blob = blob.replace("{{ title }}", properties.title)
-    blob = blob.replace("{{ count }}", count)
-    blob = blob.replace("{{ count }}", count)
-    count = count + 1;
-    
+const CodeAndTerminal = (properties, children) => {
+    const file = readSync('./polyscribe-canvas/src/components/code-and-terminal/index.html')
+    let blob = String(file)    
     // Convert children to plaintext
     const child = toHtml(children)
     blob=blob.replace('{{ children }}', child)
@@ -31,17 +24,9 @@ const Collapse = (properties, children) => {
             return
         }
     })
-    // visit(hast, 'element', function (node, index, parent) {
-    //     if(['span'].includes(node.tagName)) {
-    //         node.children[0].value = properties.title
-    //     }
-    // })
-    // visit(hast, 'element', function (node) {
-    //     if(['li'].includes())
-    // })
     
     return hast
 }
     
 
-export { Collapse }
+export { CodeAndTerminal }

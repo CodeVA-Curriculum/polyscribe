@@ -6,7 +6,7 @@ import {visit, SKIP} from 'unist-util-visit'
 import {toHtml} from 'hast-util-to-html'
 
 const CodeExample = (properties, children) => {
-    const file = readSync('./src/components/code-example/index.html')
+    const file = readSync('./polyscribe-canvas/src/components/code-example/index.html')
     let blob = String(file)
     // TODO: import course ID from CLI
     blob = blob.replace("{{ imageURL }}", `https://canvas.instructure.com/courses/13038/files/${properties.src}/preview`)

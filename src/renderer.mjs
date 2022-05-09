@@ -21,6 +21,8 @@ import {YouTube} from './components/youtube/index.mjs'
 import {Collapse} from './components/collapse/index.mjs'
 import {Callout} from './components/callout/index.mjs'
 import {CodeExample} from './components/code-example/index.mjs'
+import { CodeAndTerminal } from './components/code-and-terminal/index.mjs'
+import { Loom } from './components/loom/index.mjs'
 import rehypeImageStyle from './imageStyle.mjs'
 import remarkGfm from 'remark-gfm'
 import behead from 'remark-behead'
@@ -47,7 +49,9 @@ async function renderFile(path) {
             'youtube': YouTube,
             'collapse': Collapse,
             'callout': Callout,
-            'code-example': CodeExample
+            'code-example': CodeExample,
+            'code-and-terminal': CodeAndTerminal,
+            'loom': Loom
         },
     })
     // .use(rehypeInline)
@@ -58,7 +62,7 @@ async function renderFile(path) {
     // }
     .use(rehypePrism)
     .use(rehypeDocument, {
-        css: './src/main.css'
+        css: './polyscribe-canvas/src/main.css'
     })
     .use(rehypeInline, {
         js: false,

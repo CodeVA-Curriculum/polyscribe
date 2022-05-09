@@ -16,20 +16,20 @@ async function ask() {
             name: "readFrom",
             type: "input",
             message: "Type the path to the folder containing your modules:",
-            default: "./modules"
+            default: "../modules"
             // TODO: validate format
         },
         {
             name: "assetsLocation",
             type: "input",
             message: "Enter the path to the folder containing the media assets referenced in your modules:",
-            default: "./assets"
+            default: "../assets"
         },
         {
             name: "writeTo",
             type: "input",
             message: "Type the path of the folder you would like to create to contain the newly rendered modules:",
-            default: "./dist"
+            default: "../dist"
             // TODO: check if folder already exists, throw error if it does. Check path format
         }
     ]
