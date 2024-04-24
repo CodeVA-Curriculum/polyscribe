@@ -5,7 +5,7 @@ import {fromParse5} from 'hast-util-from-parse5'
 import {visit, SKIP} from 'unist-util-visit'
 
 const Loom = (properties, children) => {
-    const file = readSync('./polyscribe-canvas/src/components/loom/index.html')
+    const file = readSync('./src/components/loom/index.html')
     const p5ast = parse5.parse(String(file), {sourceCodeLocationInfo: true})
     const hast = fromParse5(p5ast, file)
 

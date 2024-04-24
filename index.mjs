@@ -16,32 +16,46 @@ async function ask() {
             name: "readFrom",
             type: "input",
             message: "Type the path to the folder containing your modules:",
-            default: "../modules"
+            default: "./modules"
             // TODO: validate format
         },
         {
             name: "assetsLocation",
             type: "input",
             message: "Enter the path to the folder containing the media assets referenced in your modules:",
-            default: "../assets"
+            default: "./assets"
         },
         {
             name: "writeTo",
             type: "input",
             message: "Type the path of the folder you would like to create to contain the newly rendered modules:",
-            default: "../dist"
+            default: "./dist"
             // TODO: check if folder already exists, throw error if it does. Check path format
         }
     ]
     return inquirer.prompt(questions);
 }
 
+function getAbsolutePath(relativePath) {
+    let absolutePath = relativePath
+    if(relativePath.includes('./') || relativePath.includes('../')) {
+        absolutePath = path.resolve(relativePath).replace('polyscribe-canvas/', '')
+    }
+    return absolutePath
+}
+
 async function main() {
     const {readFrom, assetsLocation, writeTo} = await ask()
-    if(readFrom != writeTo) {
+
+    // Get absolute paths
+    const readFromAbsolutePath = getAbsolutePath(readFrom)
+    const writeToAbsolutePath = getAbsolutePath(writeTo)
+    const assetsAbsolutePath = getAbsolutePath(assetsLocation)
+
+    if(readFromAbsolutePath != writeToAbsolutePath) {
         // Do the thing
-        await render(readFrom, writeTo)
-        copyDir(assetsLocation, writeTo+"/assets")
+        await render(readFromAbsolutePath, writeToAbsolutePath)
+        copyDir(assetsAbsolutePath, writeToAbsolutePath+"/assets")
     } else {
         console.log("\nThe 'write' directory cannot be the same as the 'read' directory! Try again.")
     }
@@ -95,13 +109,15 @@ async function render(readFrom, writeTo) {
     }
 }
 
-async function getFiles(path) {
-    const entries = await fs.readdir(path, { withFileTypes: true });
+async function getFiles(userPath) {
+    const absolutePath = path.resolve(userPath)
+    // console.log("Reading from", absolutePath)
+    const entries = await fs.readdir(userPath, { withFileTypes: true });
 
     // Get files within the current directory and add a path key to the file objects
     const files = entries
         .filter(file => !file.isDirectory())
-        .map(file => ({ ...file, path: path + file.name }));
+        .map(file => ({ ...file, path: userPath + file.name }));
 	
     // Get folders within the current directory
     const folders = entries.filter(folder => folder.isDirectory());
@@ -111,7 +127,7 @@ async function getFiles(path) {
           Add the found files within the subdirectory to the files array by calling the
           current function itself
         */
-        files.push(...await getFiles(`${path}${folder.name}/`));
+        files.push(...await getFiles(`${userPath}${folder.name}/`));
 
     return files;
 }

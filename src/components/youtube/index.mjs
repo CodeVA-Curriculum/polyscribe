@@ -5,7 +5,7 @@ import {fromParse5} from 'hast-util-from-parse5'
 import {visit, SKIP} from 'unist-util-visit'
 
 const YouTube = (properties, children) => {
-    const file = readSync('./polyscribe-canvas/src/components/youtube/index.html')
+    const file = readSync('./src/components/youtube/index.html')
     const p5ast = parse5.parse(String(file), {sourceCodeLocationInfo: true})
     const hast = fromParse5(p5ast, file)
 
@@ -29,6 +29,8 @@ const YouTube = (properties, children) => {
             node.properties.src=`https://www.youtube.com/embed/${properties.id}`
         }
     })
+    console.log("RETURNING YOUTUBE COMPONENT -------")
+    console.log(hast)
     return hast
 }
     

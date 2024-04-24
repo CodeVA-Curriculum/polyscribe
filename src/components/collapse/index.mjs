@@ -8,7 +8,7 @@ import {toHtml} from 'hast-util-to-html'
 let count = 0;
 
 const Collapse = (properties, children) => {
-    const file = readSync('./polyscribe-canvas/src/components/collapse/index.html')
+    const file = readSync('./src/components/collapse/index.html')
     let blob = String(file)
     blob = blob.replace("{{ title }}", properties.title)
     blob = blob.replace("{{ count }}", count)

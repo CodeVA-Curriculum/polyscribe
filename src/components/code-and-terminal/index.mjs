@@ -6,7 +6,7 @@ import {visit, SKIP} from 'unist-util-visit'
 import {toHtml} from 'hast-util-to-html'
 
 const CodeAndTerminal = (properties, children) => {
-    const file = readSync('./polyscribe-canvas/src/components/code-and-terminal/index.html')
+    const file = readSync('./src/components/code-and-terminal/index.html')
     let blob = String(file)    
     // Convert children to plaintext
     const child = toHtml(children)

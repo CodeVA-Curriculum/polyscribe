@@ -27,8 +27,12 @@ import rehypeImageStyle from './imageStyle.mjs'
 import remarkGfm from 'remark-gfm'
 import behead from 'remark-behead'
 import rehypePrism from 'rehype-prism-plus'
+import path from "path"
 // const YouTube = (properties, children) =>
   
+const cssPath = path.resolve('./src/main.css')
+
+const placeholderComponent = () => { return h('p', "test") }
 
 async function renderFile(path) {
     const html = await unified()
@@ -46,12 +50,12 @@ async function renderFile(path) {
     // .use(rehypeWrap, { selector: 'p img', wrapper: 'div.image-p'})
     .use(rehypeComponents, {
       components: {
-            'youtube': YouTube,
-            'collapse': Collapse,
-            'callout': Callout,
-            'code-example': CodeExample,
-            'code-and-terminal': CodeAndTerminal,
-            'loom': Loom
+            'youtube': placeholderComponent,
+            'collapse': placeholderComponent,
+            'callout': placeholderComponent,
+            'code-example': placeholderComponent,
+            'code-and-terminal': placeholderComponent,
+            'loom': placeholderComponent
         },
     })
     // .use(rehypeInline)
@@ -62,7 +66,7 @@ async function renderFile(path) {
     // }
     .use(rehypePrism)
     .use(rehypeDocument, {
-        css: './polyscribe-canvas/src/main.css'
+        css: cssPath
     })
     .use(rehypeInline, {
         js: false,
