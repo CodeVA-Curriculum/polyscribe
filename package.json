@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "css": "^3.0.0",
+    "hast-util-from-html": "^2.0.1",
     "hast-util-from-parse5": "^7.1.0",
     "hast-util-to-html": "^8.0.3",
     "inquirer": "^8.2.1",

@@ -51,11 +51,11 @@ async function renderFile(path) {
     .use(rehypeComponents, {
       components: {
             'youtube': YouTube,
-            'collapse': placeholderComponent,
-            'callout': placeholderComponent,
-            'code-example': placeholderComponent,
-            'code-and-terminal': placeholderComponent,
-            'loom': placeholderComponent
+            'collapse': Collapse,
+            'callout': Callout,
+            'code-example': CodeExample,
+            'code-and-terminal': CodeAndTerminal,
+            'loom': Loom
         },
     })
     // .use(rehypeInline)
