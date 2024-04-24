@@ -6,9 +6,11 @@
   "author": "Jon Stapleton <stapleton.jon.michael@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf ./dist && node index.mjs"
+    "build": "rm -rf ./dist && node index.mjs",
+    "copy": "node copy.mjs"
   },
   "dependencies": {
+    "copy-paste": "^1.5.3",
     "css": "^3.0.0",
     "hast-util-from-html": "^2.0.1",
     "hast-util-from-parse5": "^7.1.0",
