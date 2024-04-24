@@ -103,7 +103,7 @@ async function render(readFrom, writeTo) {
 
         // Get the new path
         await write({
-            path: newDirectory+file.name.replace('.md', '.html'),
+            path: newDirectory+'/'+file.name.replace('.md', '.html'),
             value: vf.value
         })
     }
