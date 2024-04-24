@@ -15,7 +15,7 @@
     "inquirer": "^8.2.1",
     "parse5": "^6.0.1",
     "rehype-add-classes": "^1.0.0",
-    "rehype-components": "marekweb/rehype-components",
+    "rehype-components": "^0.3.0",
     "rehype-document": "^6.0.1",
     "rehype-format": "^4.0.1",
     "rehype-inline": "^2.0.0",
