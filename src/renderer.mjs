@@ -50,7 +50,7 @@ async function renderFile(path) {
     // .use(rehypeWrap, { selector: 'p img', wrapper: 'div.image-p'})
     .use(rehypeComponents, {
       components: {
-            'youtube': placeholderComponent,
+            'youtube': YouTube,
             'collapse': placeholderComponent,
             'callout': placeholderComponent,
             'code-example': placeholderComponent,
