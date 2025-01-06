@@ -3,11 +3,9 @@ import {write, read} from 'to-vfile'
 import {renderFile} from './src/renderer.mjs'
 import inquirer from 'inquirer'
 import path from "path"
-import { getAbsolutePath, getFiles, uploadFile } from './utils.mjs'
+import { getAbsolutePath, getFiles, readYAML } from './utils.mjs'
 import * as commander from 'commander'
-import YAML from 'yaml'
 import { uploadAssets } from './src/upload.mjs'
-import { request } from './utils.mjs'
 
 // const file = await read('./src/tests/module-1/sample.md')
 // const html = await renderFile(file)
@@ -60,20 +58,32 @@ async function main() {
     const writeToAbsolutePath = getAbsolutePath(options.path + '/build')
     const assetsAbsolutePath = getAbsolutePath(options.path + '/assets')
 
+    global.paths = {
+        readFrom: readFromAbsolutePath,
+        writeTo: writeToAbsolutePath,
+        assets: readFromAbsolutePath + '/assets'
+    }
+
     // Get configuration
     global.config = await readYAML(readFromAbsolutePath + '/config.yaml')
     const s = await readYAML(readFromAbsolutePath + '/secret.yaml')
     global.secret = s.token
 
     if(readFromAbsolutePath != writeToAbsolutePath) {
-        // Do the thing
+        // Upload all images & generate assets/manifest.json
+        uploadAssets(global.paths.assets)
+
+        // Create new modules & add their IDs to `modules/manifest.json`, if they don't already exist
+
+        // Render HTML to `build` directory
         // await render(readFromAbsolutePath + '/modules', writeToAbsolutePath)
-        // copyDir(assetsAbsolutePath, writeToAbsolutePath+"/assets")
+
+        // Upload pages to Canvas
     } else {
         console.error("\nThe 'write' directory cannot be the same as the 'read' directory! Try again.")
     }
 
-    uploadFile('./osso-buco.jpg')
+    
 }
 
 async function copyDir(src, dest) {
@@ -121,16 +131,6 @@ async function render(readFrom, writeTo) {
             path: newDirectory+'/'+file.name.replace('.md', '.html'),
             value: vf.value
         })
-    }
-}
-
-async function readYAML(path) {
-    try {
-        const file = await read(path)
-        const obj = await YAML.parse(file.toString())
-        return obj
-    } catch(err) {
-        console.error(err)
     }
 }
 

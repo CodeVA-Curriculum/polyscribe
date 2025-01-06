@@ -1,6 +1,5 @@
 import {visit} from 'unist-util-visit'
-import { request } from '../utils.mjs'
-import axios from 'axios'
+import { getManifest } from './upload.mjs'
 
 export default function rehypeImageStyle() {
     return (tree) => {
@@ -10,32 +9,15 @@ export default function rehypeImageStyle() {
                 node.properties.className = ["image"]
                 parent.properties.className = ["image-wrapper"]
                 if(node.properties.src && !node.properties.src.includes('http')) {
-                    // Check to see if the file exists on Canvas
-                    const res = await request('/files')
-                    let found = false
-                    let id = ''
-                    for(const file of res.data) {
-                        const folder = await request('/folders/' + file.folder_id)
-                        if(folder.name == 'polyscribe' && file.filename == node.properties.src) {
-                            // asset has been uploaded, use id from response in HTML
-                            found = true
-                            id = file.id
-                            break
-                        }
+                    // Get image ID from assets/manifest.yaml
+                    const manifest = getManifest(global.paths.assets)
+                    const id = ''
+                    if(manifest[node.properties.src]) {
+                        id = manifest[node.properties.src]
+                    } else {
+                        throw new Error(`Cannot find ${node.properties.src} in manifest.json!`)
                     }
-
-                    // If it doesn't exist, upload it & get the ID
-                    if(!found) {
-                        fileInfo = {
-                            name: node.properties.src,
-                            parent_folder_path: 'polyscribe'
-                        }
-                        axios.post(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/files`, fileInfo, {
-                            headers: { 'Authorization': `Bearer ${global.secret}`}
-                        })
-                    }
-
-                    node.properties.src=`https://virtualvirginia.instructure.com/courses/${global.config.id}/files/${node.properties.src}/preview`
+                    node.properties.src=`https://virtualvirginia.instructure.com/courses/${global.config.id}/files/${id}/preview`
                 }
             }
         })

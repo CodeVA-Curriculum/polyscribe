@@ -1,8 +1,9 @@
 import path from 'path'
 import fs from 'fs'
 import axios from 'axios'
-import {read} from 'to-vfile'
+import {read, write} from 'to-vfile'
 import FormData from 'form-data'
+import YAML from 'yaml'
 
 function getAbsolutePath(relativePath) {
     let absolutePath = relativePath
@@ -72,37 +73,14 @@ async function getFileId() {
     return id.length > 0? id : found
 }
 
-async function uploadFile(filePath) {
-    // upload the file & return the File object
-    let stats = fs.statSync(filePath);
-    let fileSizeInBytes = stats.size;
-    const fileName = filePath.substring(filePath.lastIndexOf('/') + 1)
-    console.log(fileSizeInBytes)
-    const fileInfo = {
-        name: fileName,
-        parent_folder_path: 'polyscribe',
-        size: fileSizeInBytes
+async function readYAML(path) {
+    try {
+        const file = await read(path)
+        const obj = await YAML.parse(file.toString())
+        return obj
+    } catch(err) {
+        console.error(err)
     }
-
-    const info = await axios.post(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/files`, fileInfo, {
-        headers: { 'Authorization': `Bearer ${global.secret}`}
-    })
-    console.log("Got upload info", info.data.upload_params)
-
-    const uploadRes = await axios.post(info.data.upload_url, {
-        ...info.data.upload_params,
-        file: fs.createReadStream(filePath)
-        }, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-    // console.log(uploadRes)
-    const confirmRes = await axios.get(uploadRes.data.location, { headers : {
-        "Authorization": `Bearer ${global.secret}`
-    }})
-    console.log(confirmRes.status)
 }
 
-
-export {getAbsolutePath, getFiles, request, getFileId, uploadFile}
+export {getAbsolutePath, getFiles, request, getFileId, readYAML}
