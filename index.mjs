@@ -3,55 +3,77 @@ import {write, read} from 'to-vfile'
 import {renderFile} from './src/renderer.mjs'
 import inquirer from 'inquirer'
 import path from "path"
-import { getAbsolutePath, getFiles } from './utils.mjs'
+import { getAbsolutePath, getFiles, uploadFile } from './utils.mjs'
+import * as commander from 'commander'
+import YAML from 'yaml'
+import { uploadAssets } from './src/upload.mjs'
+import { request } from './utils.mjs'
 
 // const file = await read('./src/tests/module-1/sample.md')
 // const html = await renderFile(file)
 // console.log(String(html));
 
 main()
+const questions = [
+    {
+        name: "readFrom",
+        type: "input",
+        message: "Type the path to the folder containing your modules:",
+        default: "./modules"
+        // TODO: validate format
+    },
+    {
+        name: "assetsLocation",
+        type: "input",
+        message: "Enter the path to the folder containing the media assets referenced in your modules:",
+        default: "./assets"
+    },
+    {
+        name: "writeTo",
+        type: "input",
+        message: "Type the path of the folder you would like to create to contain the newly rendered modules:",
+        default: "./dist"
+        // TODO: check if folder already exists, throw error if it does. Check path format
+    }
+]
 
-async function ask() {
-    const questions = [
-        {
-            name: "readFrom",
-            type: "input",
-            message: "Type the path to the folder containing your modules:",
-            default: "./modules"
-            // TODO: validate format
-        },
-        {
-            name: "assetsLocation",
-            type: "input",
-            message: "Enter the path to the folder containing the media assets referenced in your modules:",
-            default: "./assets"
-        },
-        {
-            name: "writeTo",
-            type: "input",
-            message: "Type the path of the folder you would like to create to contain the newly rendered modules:",
-            default: "./dist"
-            // TODO: check if folder already exists, throw error if it does. Check path format
-        }
-    ]
+async function ask(questions) {
     return inquirer.prompt(questions);
 }
 
 async function main() {
-    const {readFrom, assetsLocation, writeTo} = await ask()
+    const program = new commander.Command()
+    
+    program
+        .name('polyscribe-canvas')
+        .description('CLI to render Canvas modules')
+        .version('0.2.1');
+    
+    program
+        .option('--path <path>')
+    
+    program.parse()
+    const options = program.opts()
 
     // Get absolute paths
-    const readFromAbsolutePath = getAbsolutePath(readFrom)
-    const writeToAbsolutePath = getAbsolutePath(writeTo)
-    const assetsAbsolutePath = getAbsolutePath(assetsLocation)
+    const readFromAbsolutePath = getAbsolutePath(options.path)
+    const writeToAbsolutePath = getAbsolutePath(options.path + '/build')
+    const assetsAbsolutePath = getAbsolutePath(options.path + '/assets')
+
+    // Get configuration
+    global.config = await readYAML(readFromAbsolutePath + '/config.yaml')
+    const s = await readYAML(readFromAbsolutePath + '/secret.yaml')
+    global.secret = s.token
 
     if(readFromAbsolutePath != writeToAbsolutePath) {
         // Do the thing
-        await render(readFromAbsolutePath, writeToAbsolutePath)
-        copyDir(assetsAbsolutePath, writeToAbsolutePath+"/assets")
+        // await render(readFromAbsolutePath + '/modules', writeToAbsolutePath)
+        // copyDir(assetsAbsolutePath, writeToAbsolutePath+"/assets")
     } else {
-        console.log("\nThe 'write' directory cannot be the same as the 'read' directory! Try again.")
+        console.error("\nThe 'write' directory cannot be the same as the 'read' directory! Try again.")
     }
+
+    uploadFile('./osso-buco.jpg')
 }
 
 async function copyDir(src, dest) {
@@ -101,4 +123,15 @@ async function render(readFrom, writeTo) {
         })
     }
 }
+
+async function readYAML(path) {
+    try {
+        const file = await read(path)
+        const obj = await YAML.parse(file.toString())
+        return obj
+    } catch(err) {
+        console.error(err)
+    }
+}
+
 

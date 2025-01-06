@@ -21,32 +21,37 @@ import {YouTube} from './components/youtube/index.mjs'
 import {Collapse} from './components/collapse/index.mjs'
 import {Callout} from './components/callout/index.mjs'
 import {CodeExample} from './components/code-example/index.mjs'
-import { CodeAndTerminal } from './components/code-and-terminal/index.mjs'
-import { Loom } from './components/loom/index.mjs'
+import {Replit} from './components/replit/index.mjs'
+import { Praxly } from './components/praxly/index.mjs'
 import rehypeImageStyle from './imageStyle.mjs'
 import remarkGfm from 'remark-gfm'
 import behead from 'remark-behead'
+import addClasses from 'rehype-add-classes'
 import rehypePrism from 'rehype-prism-plus'
-import path from "path"
+import { ImageAside } from './components/image-aside/index.mjs'
 // const YouTube = (properties, children) =>
   
-const cssPath = path.resolve('./src/main.css')
-
-const placeholderComponent = () => { return h('p', "test") }
 
 async function renderFile(path) {
+    let frontmatter = { title: "No Title!" }
     const html = await unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(behead, { depth: 1})
     .use(remarkExtract, {yaml:yaml.parse, name:'frontmatter'})
     .use(remarkFrontmatter, ['yaml'])
-    // .use(() => (tree) => {
-    //   console.dir(tree)
-    // })
+    .use(() => (tree) => {
+        frontmatter = tree.children[0] && tree.children[0].value ? YAML.parse(tree.children[0].value) : {}
+        // if there's no frontmatter defined but there's content in the file, the frontmatter will get assigned the first element
+        if(typeof(frontmatter) == typeof('string')) {
+            frontmatter = {}
+        }
+    })
     .use(remarkDirective)
     .use(remarkDirectiveRehype)
-    .use(remarkRehype)
+    .use(remarkRehype, {
+        allowDangerousHtml: true
+    })
     // .use(rehypeWrap, { selector: 'p img', wrapper: 'div.image-p'})
     .use(rehypeComponents, {
       components: {
@@ -54,19 +59,19 @@ async function renderFile(path) {
             'collapse': Collapse,
             'callout': Callout,
             'code-example': CodeExample,
-            'code-and-terminal': CodeAndTerminal,
-            'loom': Loom
+            'replit': Replit,
+            'praxly': Praxly,
+            'image-aside': ImageAside
         },
     })
     // .use(rehypeInline)
-    // .use(addClasses, {
-    //   h1: 'title',
-    //   body: 'section'
-    //   // TODO: add classes
-    // }
+    .use(addClasses, {
+      h1: 'title',
+      body: 'section'
+    })
     .use(rehypePrism)
     .use(rehypeDocument, {
-        css: cssPath
+        css: './src/main.css'
     })
     .use(rehypeInline, {
         js: false,
@@ -75,12 +80,24 @@ async function renderFile(path) {
         imports: false,
         svgElements: false,
     })
+    // .use(rehypeDocument, {
+    //     // css: './src/main.css'
+    // })
+    // .use(rehypeInline, {
+    //     js: false,
+    //     css: true,
+    //     images: false,
+    //     imports: false,
+    //     svgElements: false,
+    // })
     .use(rehypeImageStyle)
     .use(rehypeInjectStyles)
     .use(rehypeDecapitate)
     .use(rehypeCanvasWrapper)
     .use(rehypeFormat)
-    .use(rehypeStringify)
+    .use(rehypeStringify, {
+        allowDangerousHtml: true
+    })
     .process(await read(path))
     return html;
 }
