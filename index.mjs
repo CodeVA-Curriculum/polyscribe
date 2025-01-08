@@ -13,7 +13,6 @@ const questions = [
         type: "input",
         message: "Type the path to the folder containing your modules:",
         default: "./modules"
-        // TODO: validate format
     },
     {
         name: "assetsLocation",
@@ -26,7 +25,6 @@ const questions = [
         type: "input",
         message: "Type the path of the folder you would like to create to contain the newly rendered modules:",
         default: "./dist"
-        // TODO: check if folder already exists, throw error if it does. Check path format
     }
 ]
 
@@ -63,6 +61,10 @@ async function main() {
     // TODO:
     // program.command('preview')
     //     .description("Set up a development web server to preview course elements as you author them.")
+
+    // TODO:
+    // program.command('auth')
+    //     .description("Test your API key to ensure you can authenticate against Canvas using polyscribe.")
     
     program.parse()
     console.log(options)
@@ -105,7 +107,7 @@ async function main() {
 
     // Step 1: Check to make sure the build directory doesn't already exist, then render the files specified by the selected options
     await deleteBuildDirDialogue(global.paths.writeTo)
-    const renderReport = await renderElements(global.paths.readFrom, global.paths.writeTo)
+    let renderReport = await renderElements(global.paths.readFrom, global.paths.writeTo)
 
     // Step 2: TODO: Check the settings in `config.yaml` to make sure everything is valid & authentication works
 
@@ -115,6 +117,12 @@ async function main() {
     console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json\n`)
     
     // Step 3: Ask user for next steps:
-    await handleAssets(global.paths.assets)
+    const res = await handleAssets(global.paths.assets)
+    if(res) { renderReport = await deleteBuildDirDialogue(global.paths.writeTo); await renderElements(global.paths.readFrom, global.paths.writeTo) }
+    
+    console.log(`\nRendered ${renderReport.numberOfFilesRendered} files to ${global.paths.writeTo}`)
+    console.log(`   Found ${renderReport.assetsNotInManifest.length} assets not in assets/manifest.json`)
+    console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json\n`)
+
     await handleElements(global.paths.writeTo, renderReport.rendered, renderReport.frontmatters)
 }

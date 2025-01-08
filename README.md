@@ -142,7 +142,6 @@ The "module" folders described above should contain `.md` files. These files rep
 ---
 title: Welcome!
 type: page
-draft: false
 ---
 
 Hello! Welcome to the course. Here are some useful links you might need:

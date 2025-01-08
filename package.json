@@ -1,14 +1,12 @@
 {
-  "name": "java-summer-modules",
+  "name": "polyscribe",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.mjs",
   "repository": "git@github.com:CodeVA-Curriculum/java-summer-modules.git",
   "author": "Jon Stapleton <stapleton.jon.michael@gmail.com>",
   "license": "MIT",
-  "scripts": {
-    "build": "rm -rf ./dist && node index.mjs",
-    "copy": "node copy.mjs"
-  },
+  "type": "module",
+  "bin": "./index.mjs",
   "dependencies": {
     "axios": "^1.7.9",
     "commander": "^13.0.0",
