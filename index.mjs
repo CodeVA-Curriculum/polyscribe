@@ -1,11 +1,7 @@
 import fs from 'fs'
-import {write, read} from 'to-vfile'
-import {renderFile} from './src/element-renderer/renderer.mjs'
 import inquirer from 'inquirer'
-import path from "path"
 import { getAbsolutePath, getFiles, readYAML } from './utils.mjs'
 import * as commander from 'commander'
-import { uploadAssets } from './src/api/upload.mjs'
 import { renderElements } from './src/element-renderer/index.mjs'
 import { deleteBuildDirDialogue } from './src/dialogues/deleteBuildDir.mjs'
 import { handleAssets, handleElements } from './src/dialogues/handleMissing.mjs'
