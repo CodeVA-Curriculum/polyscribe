@@ -11,6 +11,8 @@ const types = {
 }
 
 export async function uploadElements(path, elements, frontmatters) {
+    // TODO: Compare the existing manifest to the Pages on Canvas.
+    // This is to check for Pages that were deleted online, but that still exist in the modules/manifest.json file.
     const manifest = await getManifest(global.paths.root + '/modules')
     for(const element of elements) {
         const id = manifest[element]

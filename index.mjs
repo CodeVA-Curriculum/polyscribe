@@ -40,28 +40,43 @@ async function ask(questions) {
 
 async function main() {
     const program = new commander.Command()
+    let options = {}
+    let command
     
     program
         .name('polyscribe-canvas')
         .description('CLI to render Canvas modules')
         .version('0.2.1');
     
-    program
+    program.command('render')
+        .description('Render course elements from a compatible course repository.')
         .argument('<string>')      // Location of course repo
         .option('--path <path>', 'A directory relative to the root directory containing course element files', './modules')
         .option('--build <build>', 'A directory relative to the root directory within which to build the rendered elements', './build')
         .option('--assets <assets', 'A directory containing course assets (images, etc.)', './assets')
-        .option('-u')            // Whether to upload everything that was rendered automatically or to ask first
+        .option('-u', 'Not yet implemented')            // TODO: Whether to upload everything that was rendered automatically or to ask first
+        .action(function () {
+            options = this.opts()
+            command = this
+        })
+    
+    // TODO:
+    // program.command('audit')
+    //     .description("(Not yet implemented) Check the course repository and course elements for mistakes or issues that will lead to failed rendering.")
+    
+    // TODO:
+    // program.command('preview')
+    //     .description("Set up a development web server to preview course elements as you author them.")
     
     program.parse()
-    const options = program.opts()
+    console.log(options)
 
     // Get paths TODO: better handling for non-standard path choices
     global.paths = {
-        root: getAbsolutePath(program.args[0]),
-        readFrom: getAbsolutePath(options.path.replace('./', program.args[0] + '/')),
-        writeTo: getAbsolutePath(options.build.replace('./', program.args[0] + '/')),
-        assets: getAbsolutePath(options.assets.replace('./', program.args[0] + '/'))
+        root: getAbsolutePath(command.args[0]),
+        readFrom: getAbsolutePath(options.path.replace('./', command.args[0] + '/')),
+        writeTo: getAbsolutePath(options.build.replace('./', command.args[0] + '/')),
+        assets: getAbsolutePath(options.assets.replace('./', command.args[0] + '/'))
     }
 
     // Get configuration
@@ -107,18 +122,3 @@ async function main() {
     await handleAssets(global.paths.assets)
     await handleElements(global.paths.writeTo, renderReport.rendered, renderReport.frontmatters)
 }
-
-// async function copyDir(src, dest) {
-//     await fs.mkdir(dest, { recursive: true });
-//     let entries = await fs.readdir(src, { withFileTypes: true });
-
-//     for (let entry of entries) {
-//         let srcPath = path.join(src, entry.name);
-//         let destPath = path.join(dest, entry.name);
-
-//         entry.isDirectory() ?
-//             await copyDir(srcPath, destPath) :
-//             await fs.copyFile(srcPath, destPath);
-//     }
-// }
-
