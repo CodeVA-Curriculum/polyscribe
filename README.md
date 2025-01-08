@@ -134,7 +134,7 @@ assets/
 
 TODO:
 
-### Course Elements
+## Course Elements
 
 The "module" folders described above should contain `.md` files. These files represent course elements (e.g., discussion boards, pages, assignments, ~~quizzes~~ (work in progress)). Authors should write their course material using Markdown in these files. Here is an example of a typical `.md` file defining a Page course element:
 
@@ -168,6 +168,10 @@ The `polyscribe-canvas` tool requires that authors create "frontmatter" in their
 | `title` | The title of the course element, which is displayed as clickable text when the course element is listed (e.g., on the *Modules* page) | `title: Welcome!` |
 | `type` | The type of course element `polyscribe-canvas` should create when rendering the `.md` file. Currently, `page`, `assignment`, and `discussion` are supported. | `type: page` |
 
+<!-- There are also some optional fields authors can define for their assignments:
+
+| `published` | A `boolean` value indicating whether or not the element should be published on upload. Defaults to `false` for new assignments. | `published: false` | -->
+
 For `page` elements, the two fields above are the only required ones. There are additional fields available for `assignment` and `discussion` types.
 
 #### Assignment Frontmatter
@@ -184,11 +188,14 @@ When creating assignments, use frontmatter fields to configure assignment settin
 
 When creating discussion boards, use frontmatter fields to configure discussion settings. You can define the following fields for `discussions`s in addition to the two required `title` and `type` fields:
 
-| Field              | Type     | Required? | Default        | Allowed Values |
-| ------------------ | -------- | --------- | -------------- | -------------- |
-|
+| Field                  | Type      | Required? | Default        | Allowed Values |
+| ---------------------- | --------- | --------- | -------------- | -------------- |
+| `discussion_type`      | `string`  | ❌        | `threaded`     | `side_comment`, `threaded`, `not_threaded` |
+| `allow_rating`         | `boolean` | ❌        | `true`         | `true`, `false` |
+| `require_initial_post` | `boolean` | ❌        | `true`         | `true`, `false` |
+| `assignment`           | `object`  | ❌        | `null`         | See `assignment` frontmatter for values |
 
-### Directives
+### Writing Course Elements
 
 ```
 ::youtube[Alt text]{#id}

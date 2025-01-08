@@ -1,7 +1,7 @@
 import {visit} from 'unist-util-visit'
 import { getManifest } from './api/upload.mjs'
 
-export default function rehypeImageStyle(cb) {
+export default function rehypeImageStyle(options) {
     return (tree) => {
         let filesNotUploaded = []
         visit(tree, 'element', async function (node, index, parent) {
@@ -11,17 +11,19 @@ export default function rehypeImageStyle(cb) {
                 parent.properties.className = ["image-wrapper"]
                 if(node.properties.src && !node.properties.src.includes('http')) {
                     // Get image ID from assets/manifest.yaml
-                    const manifest = getManifest(global.paths.assets)
-                    const id = node.properties.src
-                    if(manifest[node.properties.src]) {
-                        id = manifest[node.properties.src]
+                    let id = node.properties.src
+                    // console.log("Manifest image info", options.manifest[id])
+                    if(options.manifest[id]) {
+                        id = options.manifest[id]
                     } else {
                         filesNotUploaded.push(node.properties.src)
                     }
+                    // console.log(`Image ID for ${node.properties.src} is ${id}`)
                     node.properties.src=`https://virtualvirginia.instructure.com/courses/${global.config.id}/files/${id}/preview`
+                    console.log("Updated image URL to", node.properties.src)
                 }
             }
         })
-        cb(filesNotUploaded)
+        options.cb(filesNotUploaded)
     }
 }

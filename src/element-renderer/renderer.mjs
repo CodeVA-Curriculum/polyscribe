@@ -29,10 +29,12 @@ import behead from 'remark-behead'
 import addClasses from 'rehype-add-classes'
 import rehypePrism from 'rehype-prism-plus'
 import { ImageAside } from '../components/image-aside/index.mjs'
+import { getManifest } from '../api/upload.mjs'
 // const YouTube = (properties, children) =>
   
 
 async function renderFile(path) {
+    const manifest = await getManifest(global.paths.assets)
     const report = {
         assetsNotInManifest: []
     }
@@ -93,7 +95,10 @@ async function renderFile(path) {
     //     imports: false,
     //     svgElements: false,
     // })
-    .use(rehypeImageStyle, (assets) => report.assetsNotInManifest = [...report.assetsNotInManifest, ...assets])
+    .use(rehypeImageStyle, {
+        cb: (assets) => report.assetsNotInManifest = [...report.assetsNotInManifest, ...assets],
+        manifest: manifest
+    })
     .use(rehypeInjectStyles)
     .use(rehypeDecapitate)
     .use(rehypeCanvasWrapper)

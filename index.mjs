@@ -98,13 +98,13 @@ async function main() {
 
     // Step 2: TODO: Check the settings in `config.yaml` to make sure everything is valid & authentication works
 
-    // Step 3: TODO: Print a report showing:
+    // Step 3: Print a report showing:
     console.log(`\nRendered ${renderReport.numberOfFilesRendered} files to ${global.paths.writeTo}`)
     console.log(`   Found ${renderReport.assetsNotInManifest.length} assets not in assets/manifest.json`)
     console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json\n`)
     
-    // Step 3: TODO: Ask user for next steps:
-    // await handleAssets(global.paths.assets)
+    // Step 3: Ask user for next steps:
+    await handleAssets(global.paths.assets)
     await handleElements(global.paths.writeTo, renderReport.rendered, renderReport.frontmatters)
 }
 

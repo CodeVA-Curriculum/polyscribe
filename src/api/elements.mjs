@@ -42,7 +42,8 @@ async function uploadPage(id, element, frontmatter) {
         console.log("Uploaded", element)
     } else {
         res = await axios.put(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/pages/${id}`, body, { headers: {
-            "Authorization": `Bearer ${global.secret}`
+            "Authorization": `Bearer ${global.secret}`,
+            "Content-Type": "application/x-www-form-urlencoded"
         }})
         console.log("Updated", element)
     }
@@ -76,6 +77,30 @@ async function uploadAssignment(id, element, frontmatter) {
 }
 
 async function uploadDiscussion(id, element, frontmatter) {
-    console.log("Skipping discussion upload, not yet implemented...")
-    return false
+    const blob = (await read(global.paths.writeTo + '/' + element)).toString()
+    const body = {
+        "title": frontmatter.title,
+        "message": blob,
+        "discussion_type": frontmatter.discussion_type? frontmatter.discussion_type : "threaded",
+        "allow_rating": frontmatter.allow_rating? frontmatter.allow_rating : true,
+        "require_initial_post": frontmatter.require_initial_post? frontmatter.require_initial_post : true
+    }
+    if(frontmatter.assignment) {
+        body.assignment = frontmatter.assignment
+    }
+    let res
+    if(!id) {
+        res = await axios.post(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/discussion_topics`, body, { headers: {
+            "Authorization": `Bearer ${global.secret}`,
+            "Content-Type": "application/x-www-form-urlencoded"
+        }})
+        console.log("Uploaded", element)
+    } else {
+        res = await axios.put(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/discussion_topics/${id}`, body, { headers: {
+            "Authorization": `Bearer ${global.secret}`,
+            "Content-Type": "application/x-www-form-urlencoded"
+        }})
+        console.log("Updated", element)
+    }
+    return res.data.id
 }
