@@ -168,6 +168,26 @@ The `polyscribe-canvas` tool requires that authors create "frontmatter" in their
 | `title` | The title of the course element, which is displayed as clickable text when the course element is listed (e.g., on the *Modules* page) | `title: Welcome!` |
 | `type` | The type of course element `polyscribe-canvas` should create when rendering the `.md` file. Currently, `page`, `assignment`, and `discussion` are supported. | `type: page` |
 
+For `page` elements, the two fields above are the only required ones. There are additional fields available for `assignment` and `discussion` types.
+
+#### Assignment Frontmatter
+
+When creating assignments, use frontmatter fields to configure assignment settings. You can define the following fields for `assignment`s in addition to the two required `title` and `type` fields:
+
+| Field              | Type     | Required? | Default        | Allowed Values |
+| ------------------ | -------- | --------- | -------------- | -------------- |
+| `submission_types` | `array`  | ❌        | `[ "none" ]`   | `online_quiz`, `none`, `on_paper`, `discussion_topic`, `online_upload`, `online_text_entry`, `online_url` |
+| `points_possible`  | `number` | ❌        | `0`            | any positive number (or zero) |
+| `grading_type`     | `string` | ❌        | `"not_graded"` | `pass_fail`, `percent`, `letter_grade`, `gpa_scale`, `points`, `not_graded` |
+
+#### Discussion Frontmatter
+
+When creating discussion boards, use frontmatter fields to configure discussion settings. You can define the following fields for `discussions`s in addition to the two required `title` and `type` fields:
+
+| Field              | Type     | Required? | Default        | Allowed Values |
+| ------------------ | -------- | --------- | -------------- | -------------- |
+|
+
 ### Directives
 
 ```

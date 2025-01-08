@@ -15,8 +15,8 @@ export async function uploadElements(path, elements, frontmatters) {
     for(const element of elements) {
         const id = manifest[element]
         const frontmatter = frontmatters[element]
-        const res = await types[frontmatter.type](id, element, frontmatter)
-        if(res) { manifest[element] = res.data.page_id }
+        const newID = await types[frontmatter.type](id, element, frontmatter)
+        if(newID) { manifest[element] = newID }
     }
 
     // Update modules/manifest.json
@@ -46,13 +46,33 @@ async function uploadPage(id, element, frontmatter) {
         }})
         console.log("Updated", element)
     }
-
-    return res
+    return res.data.page_id
 }
 
 async function uploadAssignment(id, element, frontmatter) {
-    console.log("Skipping assignment upload, not yet implemented...")
-    return false
+    const blob = (await read(global.paths.writeTo + '/' + element)).toString()
+    const body = {
+        "assignment[name]": frontmatter.title,
+        "assignment[description]": blob,
+        "assignment[submission_types][]": frontmatter.submission_types? [...frontmatter.submission_types] : ["none"],
+        "assignment[points_possible]": frontmatter.points_possible? frontmatter.points_possible : 0,
+        "assignment[grading_type]": frontmatter.grading_type? frontmatter.grading_type : "not_graded"
+    }
+    let res
+    if(!id) {
+        res = await axios.post(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/assignments`, body, { headers: {
+            "Authorization": `Bearer ${global.secret}`,
+            "Content-Type": "application/x-www-form-urlencoded"
+        }})
+        console.log("Uploaded", element)
+    } else {
+        res = await axios.put(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/assignments/${id}`, body, { headers: {
+            "Authorization": `Bearer ${global.secret}`,
+            "Content-Type": "application/x-www-form-urlencoded"
+        }})
+        console.log("Updated", element)
+    }
+    return res.data.id
 }
 
 async function uploadDiscussion(id, element, frontmatter) {
