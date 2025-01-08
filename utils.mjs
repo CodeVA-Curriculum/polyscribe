@@ -83,4 +83,16 @@ async function readYAML(path) {
     }
 }
 
-export {getAbsolutePath, getFiles, request, getFileId, readYAML}
+function getDirectoriesInPath(path) {
+    const parents = path.substring(0, path.lastIndexOf('/'))
+    const folders = parents.split('/')
+    let dirs = []
+    let aggregate = ""
+    for(const folder of folders) {
+        aggregate += ("/" + folder)
+        dirs.push(aggregate.substring(1))
+    }
+    return dirs
+}
+
+export {getAbsolutePath, getFiles, request, getFileId, readYAML, getDirectoriesInPath}

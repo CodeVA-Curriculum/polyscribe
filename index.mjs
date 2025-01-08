@@ -1,15 +1,14 @@
-import fs from 'fs/promises'
+import fs from 'fs'
 import {write, read} from 'to-vfile'
-import {renderFile} from './src/renderer.mjs'
+import {renderFile} from './src/element-renderer/renderer.mjs'
 import inquirer from 'inquirer'
 import path from "path"
 import { getAbsolutePath, getFiles, readYAML } from './utils.mjs'
 import * as commander from 'commander'
-import { uploadAssets } from './src/upload.mjs'
-
-// const file = await read('./src/tests/module-1/sample.md')
-// const html = await renderFile(file)
-// console.log(String(html));
+import { uploadAssets } from './src/api/upload.mjs'
+import { renderElements } from './src/element-renderer/index.mjs'
+import { deleteBuildDirDialogue } from './src/dialogues/deleteBuildDir.mjs'
+import { handleAssets, handleElements } from './src/dialogues/handleMissing.mjs'
 
 main()
 const questions = [
@@ -48,90 +47,78 @@ async function main() {
         .version('0.2.1');
     
     program
-        .option('--path <path>')
+        .argument('<string>')      // Location of course repo
+        .option('--path <path>', 'A directory relative to the root directory containing course element files', './modules')
+        .option('--build <build>', 'A directory relative to the root directory within which to build the rendered elements', './build')
+        .option('--assets <assets', 'A directory containing course assets (images, etc.)', './assets')
+        .option('-u')            // Whether to upload everything that was rendered automatically or to ask first
     
     program.parse()
     const options = program.opts()
 
-    // Get absolute paths
-    const readFromAbsolutePath = getAbsolutePath(options.path)
-    const writeToAbsolutePath = getAbsolutePath(options.path + '/build')
-    const assetsAbsolutePath = getAbsolutePath(options.path + '/assets')
-
+    // Get paths TODO: better handling for non-standard path choices
     global.paths = {
-        readFrom: readFromAbsolutePath,
-        writeTo: writeToAbsolutePath,
-        assets: readFromAbsolutePath + '/assets'
+        root: getAbsolutePath(program.args[0]),
+        readFrom: getAbsolutePath(options.path.replace('./', program.args[0] + '/')),
+        writeTo: getAbsolutePath(options.build.replace('./', program.args[0] + '/')),
+        assets: getAbsolutePath(options.assets.replace('./', program.args[0] + '/'))
     }
 
     // Get configuration
-    global.config = await readYAML(readFromAbsolutePath + '/config.yaml')
-    const s = await readYAML(readFromAbsolutePath + '/secret.yaml')
+    global.config = await readYAML(global.paths.root + '/config.yaml')
+    const s = await readYAML(global.paths.root + '/secret.yaml')
     global.secret = s.token
 
-    if(readFromAbsolutePath != writeToAbsolutePath) {
-        // Upload all images & generate assets/manifest.json
-        uploadAssets(global.paths.assets)
+    // Step 0: Validate prerequisite settings
+    if(global.paths.readFrom == global.paths.writeTo) { throw new Error("The 'write' directory cannot be the same as the 'read' directory! Try again.") }
 
-        // Create new modules & add their IDs to `modules/manifest.json`, if they don't already exist
-
-        // Render HTML to `build` directory
-        // await render(readFromAbsolutePath + '/modules', writeToAbsolutePath)
-
-        // Upload pages to Canvas
-    } else {
-        console.error("\nThe 'write' directory cannot be the same as the 'read' directory! Try again.")
-    }
-
-    
-}
-
-async function copyDir(src, dest) {
-    await fs.mkdir(dest, { recursive: true });
-    let entries = await fs.readdir(src, { withFileTypes: true });
-
-    for (let entry of entries) {
-        let srcPath = path.join(src, entry.name);
-        let destPath = path.join(dest, entry.name);
-
-        entry.isDirectory() ?
-            await copyDir(srcPath, destPath) :
-            await fs.copyFile(srcPath, destPath);
-    }
-}
-
-// TODO: throw error if the target directory is in the wrong format
-async function render(readFrom, writeTo) {
-    let madeDirs = []
-    // Create the new destination directory
-    await fs.mkdir(writeTo)
-    madeDirs.push(writeTo+"/")
-
-    // Get all the files in ./modules/
-    const files = await getFiles(readFrom +'/')
-    
-    // For each file in ./modules/, create a rendered version in ./dist/
-    for(const file of files) {
-        // Create the directory
-        let newDirectory = file.path.replace(readFrom+'/', "")
-        console.log("Rendering "+newDirectory+'...')
-        newDirectory = writeTo+"/"+newDirectory.substring(0, newDirectory.indexOf('/'))
-
-        // If the folder doesn't already exist
-        if(!madeDirs.includes(newDirectory)) {
-            await fs.mkdir(newDirectory)
-            madeDirs.push(newDirectory)
+    // Generate element manifest if it doesn't exist
+    if(!fs.existsSync(global.paths.root + "/modules/manifest.json")) {
+        console.log("Element manifest not found, generating blank manifest...")
+        try {
+            fs.writeFileSync(`${global.paths.root}/modules/manifest.json`, "{}");
+        } catch (err) {
+            throw new Error(err)
         }
-
-        // Render the file
-        const vf = await renderFile(file.path)
-
-        // Get the new path
-        await write({
-            path: newDirectory+'/'+file.name.replace('.md', '.html'),
-            value: vf.value
-        })
     }
+
+    // Generate assets manifest if it doesn't exist
+    if(!fs.existsSync(global.paths.root + "/assets/manifest.json")) {
+        console.log("Asset manifest not found, generating blank manifest...")
+        try {
+            fs.writeFileSync(`${global.paths.root}/assets/manifest.json`, "{}");
+        } catch (err) {
+            throw new Error("Could not generate asset manifest!")
+        }
+    }
+
+    // Step 1: Check to make sure the build directory doesn't already exist, then render the files specified by the selected options
+    await deleteBuildDirDialogue(global.paths.writeTo)
+    const renderReport = await renderElements(global.paths.readFrom, global.paths.writeTo)
+
+    // Step 2: TODO: Check the settings in `config.yaml` to make sure everything is valid & authentication works
+
+    // Step 3: TODO: Print a report showing:
+    console.log(`\nRendered ${renderReport.numberOfFilesRendered} files to ${global.paths.writeTo}`)
+    console.log(`   Found ${renderReport.assetsNotInManifest.length} assets not in assets/manifest.json`)
+    console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json\n`)
+    
+    // Step 3: TODO: Ask user for next steps:
+    // await handleAssets(global.paths.assets)
+    await handleElements(global.paths.writeTo, renderReport.rendered, renderReport.frontmatters)
 }
 
+// async function copyDir(src, dest) {
+//     await fs.mkdir(dest, { recursive: true });
+//     let entries = await fs.readdir(src, { withFileTypes: true });
+
+//     for (let entry of entries) {
+//         let srcPath = path.join(src, entry.name);
+//         let destPath = path.join(dest, entry.name);
+
+//         entry.isDirectory() ?
+//             await copyDir(srcPath, destPath) :
+//             await fs.copyFile(srcPath, destPath);
+//     }
+// }
 
