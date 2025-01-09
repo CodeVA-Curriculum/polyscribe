@@ -242,7 +242,7 @@ You should write content you would like the page to reveal when the user clicks 
 
 The `:::code-example` directive represents one or more `<pre />` elements paired with an image, often a screenshot of the code's output. Here is a simple example of a `:::code-example` and a screenshot of it's output on Canvas:
 
-```md
+<pre>
 Check out the program below!
 
 :::code-example{src="tree-and-sun.png" alt="The output of the program above, displaying a sun and a tree rendered using simple shapes"}
@@ -269,6 +269,7 @@ void draw() {
 }
 ```
 :::
+</pre>
 
 ![A screenshot of the :::code-example directive as it appears on Canvas](docs/code-example-notabs.png)
 
@@ -276,7 +277,7 @@ The `alt` parameter provides the alt text for the image. The default value for t
 
 The `:::code-example` directive also has support for tabs, providing a way for authors to write code examples spread across multiple files. To activate this feature, pass the `tabs` parameter within the `{}` following `:::code-example`. Here's an example:
 
-```md
+<pre>
 Check out the program below!
 
 :::code-example{src="obj-tree.png" tabs}
@@ -316,7 +317,7 @@ class Tree {
 }
 ```
 :::
-```
+</pre>
 
 ![A screenshot of the :::code-example directive with tabs as it appears on Canvas](docs/code-example-tabs.png)
 
