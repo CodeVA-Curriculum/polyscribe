@@ -25,13 +25,19 @@ export async function renderElements(readFrom, writeTo) {
         throw new Error("Cannot render elements at path " + readFrom)
     }
 
+    
+
     // Render the files to `build`
     for(const file of files) {
         // Render the file
         console.log("Rendering", file)
         const {output, report, frontmatter} = await renderFile(file)
 
-        const cleanFile = file.replace(readFrom, '').replace('.md', '.html').substring(1)
+        let cleanFile =file.replace(readFrom, '').replace('.md', '.html').substring(1)
+        if(!(readFrom == global.paths.root + '/modules')) {
+            const append = readFrom.replace(global.paths.root + '/modules/', '')   
+            cleanFile = append + "/" + cleanFile
+        }
 
         // Create directorie(s) for new file
         const requiredDirs = getDirectoriesInPath(cleanFile)
@@ -47,6 +53,7 @@ export async function renderElements(readFrom, writeTo) {
             path: writeTo+"/"+cleanFile,
             value: output.value
         })
+        
         summary.rendered.push(cleanFile)
         summary.numberOfFilesRendered++
         summary.assetsNotInManifest = [...summary.assetsNotInManifest, ...report.assetsNotInManifest]
@@ -56,6 +63,7 @@ export async function renderElements(readFrom, writeTo) {
     // Check `modules/manifest.json` for files that don't have IDs assigned yet & add them to the report
     const manifest = await getManifest(global.paths.root + '/modules')
     for(const file of summary.rendered) {
+        console.log(file)
         if(!manifest[file]) {
             summary.elementsNotInManifest.push(file)
         }

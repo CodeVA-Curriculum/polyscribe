@@ -72,19 +72,21 @@ async function main() {
     program.parse()
     // console.log(options)
 
-    // Get paths TODO: better handling for non-standard path choices
+    // This is an absolute mess
     global.paths = {
         root: getAbsolutePath(command.args[0]),
-        readFrom: getAbsolutePath(options.path.replace('./', command.args[0] + '/')),
+        readFrom: getAbsolutePath(options.path == './modules' ? options.path.replace('./', command.args[0] + '/') : options.path),
         writeTo: getAbsolutePath(options.build.replace('./', command.args[0] + '/')),
         assets: getAbsolutePath(options.assets.replace('./', command.args[0] + '/'))
     }
+
+    // Crimes!
     global.manifest = {
         assets: await getManifest(global.paths.assets),
         modules: await getManifest(global.paths.root + "/modules")
     }
 
-    // console.log(global.paths)
+    console.log(global.paths)
 
     // Get configuration
     global.config = await readYAML(global.paths.root + '/config.yaml')
