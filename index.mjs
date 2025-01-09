@@ -7,7 +7,9 @@ import * as commander from 'commander'
 import { renderElements } from './src/element-renderer/index.mjs'
 import { deleteBuildDirDialogue } from './src/dialogues/deleteBuildDir.mjs'
 import { handleAssets, handleElements } from './src/dialogues/handleMissing.mjs'
-import { getManifest } from './src/api/upload.mjs'
+import { getManifest } from './src/api/manifest.mjs'
+import { displayReport } from './src/validation/renderReport.mjs'
+import { uploadElements } from './src/api/elements.mjs'
 
 main()
 const questions = [
@@ -80,13 +82,7 @@ async function main() {
         assets: getAbsolutePath(options.assets.replace('./', command.args[0] + '/'))
     }
 
-    // Crimes!
-    global.manifest = {
-        assets: await getManifest(global.paths.assets),
-        modules: await getManifest(global.paths.root + "/modules")
-    }
-
-    console.log(global.paths)
+    // console.log(global.paths)
 
     // Get configuration
     global.config = await readYAML(global.paths.root + '/config.yaml')
@@ -116,27 +112,27 @@ async function main() {
         }
     }
 
-    // Step 1: Check to make sure the build directory doesn't already exist, then render the files specified by the selected options
+    // Crimes!
+    global.manifest = {
+        assets: await getManifest(global.paths.assets),
+        modules: await getManifest(global.paths.root + "/modules")
+    }
+
+    // Check to make sure the build directory doesn't already exist, let the user delete it if it does
     await deleteBuildDirDialogue(global.paths.writeTo, false)
+
+    // Render the elements and generate a report showing problems
     let renderReport = await renderElements(global.paths.readFrom, global.paths.writeTo)
 
-    // Step 2: TODO: Check the settings in `config.yaml` to make sure everything is valid & authentication works
-
     // Step 3: Print a report showing:
-    console.log(`\nRendered ${renderReport.numberOfFilesRendered} files to ${global.paths.writeTo}`)
+    console.log(`\nRendered ${renderReport.numberOfFilesRendered} files`)
     console.log(`   Found ${renderReport.assetsNotInManifest.length} assets not in assets/manifest.json`)
-    console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json\n`)
-    
-    // Step 3: Ask user for next steps:
-    const res = await handleAssets(global.paths.assets)
-    if(res) { 
-        await deleteBuildDirDialogue(global.paths.writeTo, true)
-        renderReport = await renderElements(global.paths.readFrom, global.paths.writeTo)
-    }
-    
-    console.log(`\nRendered ${renderReport.numberOfFilesRendered} files to ${global.paths.writeTo}`)
-    console.log(`   Found ${renderReport.assetsNotInManifest.length} assets not in assets/manifest.json`)
-    console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json\n`)
+    console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json`)
+    console.log(`   Found ${renderReport.anchorsNotInManifest.length} anchor elements pointing to pages not in modules/manifest.json\n`)
 
+    // TODO: await displayReport(renderReport)
+
+    await handleAssets(global.paths.assets)
     await handleElements(global.paths.writeTo, renderReport.rendered, renderReport.frontmatters)
+    
 }

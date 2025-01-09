@@ -29,19 +29,41 @@ import behead from 'remark-behead'
 import addClasses from 'rehype-add-classes'
 import rehypePrism from 'rehype-prism-plus'
 import { ImageAside } from '../components/image-aside/index.mjs'
-import { getManifest } from '../api/upload.mjs'
 // const YouTube = (properties, children) =>
 import { fileURLToPath } from 'url';
 import pathUtil from 'node:path'
+import auditAnchors from '../plugins/auditAnchors.mjs'
   
 
 async function renderFile(path) {
-    const manifest = await getManifest(global.paths.assets)
     const report = {
-        assetsNotInManifest: []
+        assetsNotInManifest: [],
+        anchorsNotInManifest: []
     }
     let frontmatter = { title: "No Title!" }
-    const html = await unified()
+    let html = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(behead, { depth: 1})
+    .use(remarkExtract, {yaml:yaml.parse, name:'frontmatter'})
+    .use(remarkFrontmatter, ['yaml'])
+    .use(() => (tree) => {
+        frontmatter = tree.children[0] && tree.children[0].value ? yaml.parse(tree.children[0].value) : {}
+        // if there's no frontmatter defined but there's content in the file, the frontmatter will get assigned the first element
+        if(typeof(frontmatter) == typeof('string')) {
+            frontmatter = {}
+        }
+    })
+    .use(remarkRehype, {
+        allowDangerousHtml: true
+    })
+    .use(rehypeFormat)
+    .use(rehypeStringify, {
+        allowDangerousHtml: true
+    })
+    .process(await read(path))
+
+    html = await unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(behead, { depth: 1})
@@ -59,7 +81,12 @@ async function renderFile(path) {
     .use(remarkRehype, {
         allowDangerousHtml: true
     })
-    // .use(rehypeWrap, { selector: 'p img', wrapper: 'div.image-p'})
+    .use(auditAnchors, {
+        cb: (anchors) => report.anchorsNotInManifest = [...report.anchorsNotInManifest, ...anchors],
+        manifest: global.manifest.modules,
+        frontmatter: frontmatter,
+        path: path
+    })
     .use(rehypeComponents, {
       components: {
             'youtube': YouTube,
@@ -87,19 +114,9 @@ async function renderFile(path) {
         imports: false,
         svgElements: false,
     })
-    // .use(rehypeDocument, {
-    //     // css: './src/main.css'
-    // })
-    // .use(rehypeInline, {
-    //     js: false,
-    //     css: true,
-    //     images: false,
-    //     imports: false,
-    //     svgElements: false,
-    // })
     .use(rehypeImageStyle, {
         cb: (assets) => report.assetsNotInManifest = [...report.assetsNotInManifest, ...assets],
-        manifest: manifest
+        manifest: global.manifest.assets
     })
     .use(rehypeInjectStyles)
     .use(rehypeDecapitate)

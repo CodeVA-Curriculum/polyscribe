@@ -1,6 +1,7 @@
 import fs from 'fs'
 import {read} from 'to-vfile'
 import axios from 'axios'
+import { generateManifest } from './manifest.mjs'
 
 export async function uploadAssets(path) {
     // Find all files in `assets`
@@ -9,10 +10,12 @@ export async function uploadAssets(path) {
         if(file != 'manifest.json') { assetFiles.push(path + '/' + file) }
     });
 
+    console.log('')
     // upload all assets to `polyscribe` folder in course
     for(const file of assetFiles) {
         await uploadFile(file)
     }
+    console.log('')
 
     // generate assets/manifest.json
     global.manifest.assets = await generateManifest(path)
@@ -47,54 +50,12 @@ export async function uploadFile(filePath) {
     console.log(`Uploaded file ${confirmRes.data.filename} to Canvas, assigned ID ${confirmRes.data.id}`)
 }
 
-export async function getManifest(assetsPath) {
-    const manifest = JSON.parse((await read(assetsPath + '/manifest.json')).toString())
-    return manifest
-}
-
-async function generateManifest(assetsPath) {
-    // Find `polyscribe folder ID`
-    const res = await axios.get(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/folders`, { headers: {
-        "Authorization": `Bearer ${global.secret}`
-    }})
-    let folderId = '';
-    let filesURL = ''
-    let found = false
-    for(const folder of res.data) {
-        if(folder.name == 'polyscribe') {
-            folderId = folder.id
-            filesURL = folder.files_url
-            found = true
-        }
-    }
-    if(!found) { throw new Error("Could not find folder with name 'polyscribe' in course!")}
-
-    // Get all files in the `polyscribe` folder
-    const files = (await axios.get(filesURL, { headers: {
-        "Authorization": `Bearer ${global.secret}`
-    }})).data
-
-    // Create JSON object with file info
-    let info = {}
-    for(const file of files) {
-        info[file.filename] = file.id
-    }
-
-    // Write JSON object to assets/manifest.json
-    try {
-        fs.writeFileSync(`${global.paths.assets}/manifest.json`, JSON.stringify(info));
-    } catch (err) {
-        console.log(err);
-    }
-    return info
-}
-
 export function getAssetId(src, manifest) {
     // Get image ID from assets/manifest.yaml
     let id = src
-    console.log(manifest)
+    // console.log(manifest)
     if(manifest[id]) {
-        id = manifest[id]
+        id = manifest[id].id
     } else {
         console.log(`\nWarning! Could not find asset ID for ${id} in assets/manifest.json`)
     }

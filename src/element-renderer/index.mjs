@@ -3,15 +3,16 @@ import {glob} from 'glob'
 import { renderFile } from './renderer.mjs'
 import {write} from 'to-vfile'
 import { getDirectoriesInPath } from '../../utils.mjs'
-import { getManifest } from '../api/upload.mjs'
 
 export async function renderElements(readFrom, writeTo) {
     let summary = {
         rendered: [],
         numberOfFilesRendered: 0,
         assetsNotInManifest: [],
+        anchorsNotInManifest: [],
         elementsNotInManifest: [],
-        frontmatters: {}
+        frontmatters: {},
+        toWrite: []
     }
     let dirs = []
     // Figure out how much to render; if `path` points to a file, just build the file.
@@ -27,7 +28,7 @@ export async function renderElements(readFrom, writeTo) {
 
     
 
-    // Render the files to `build`
+    // Render the files
     for(const file of files) {
         // Render the file
         console.log("Rendering", file)
@@ -47,27 +48,32 @@ export async function renderElements(readFrom, writeTo) {
                 dirs.push(dir)
             }
         }
-
-
-        await write({
-            path: writeTo+"/"+cleanFile,
-            value: output.value
-        })
         
         summary.rendered.push(cleanFile)
         summary.numberOfFilesRendered++
         summary.assetsNotInManifest = [...summary.assetsNotInManifest, ...report.assetsNotInManifest]
+        summary.anchorsNotInManifest = [...summary.anchorsNotInManifest, ...report.anchorsNotInManifest]
         summary.frontmatters[cleanFile] = frontmatter
+        summary.toWrite = [...summary.toWrite, {
+            path: writeTo + "/" + cleanFile,
+            value: output.value
+        }]
+
+        await write({
+            path: writeTo + '/' + cleanFile,
+            value: output.value
+        })
     }
 
     // Check `modules/manifest.json` for files that don't have IDs assigned yet & add them to the report
-    const manifest = await getManifest(global.paths.root + '/modules')
+    const manifest = global.manifest.modules
     for(const file of summary.rendered) {
-        console.log(file)
+        // console.log(file)
         if(!manifest[file]) {
             summary.elementsNotInManifest.push(file)
         }
     }
 
+    // console.log("Summary:", summary)
     return summary
 }

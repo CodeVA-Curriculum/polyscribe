@@ -1,6 +1,5 @@
 import axios from "axios"
 import { read } from "to-vfile"
-import { getManifest } from "./upload.mjs"
 import fs from 'fs'
 
 // Supported element types
@@ -11,14 +10,14 @@ const types = {
 }
 
 export async function uploadElements(path, elements, frontmatters) {
-    // TODO: Compare the existing manifest to the Pages on Canvas.
+    // Compare the existing manifest to the Pages on Canvas.
     // This is to check for Pages that were deleted online, but that still exist in the modules/manifest.json file.
-    const manifest = await getManifest(global.paths.root + '/modules')
+    const manifest = global.manifest.modules
     for(const element of elements) {
-        const id = manifest[element]
+        const elementID = manifest[element] ? manifest[element].id : false
         const frontmatter = frontmatters[element]
-        const newID = await types[frontmatter.type](id, element, frontmatter)
-        if(newID) { manifest[element] = newID }
+        const data = await types[frontmatter.type](elementID, element, frontmatter)
+        if(data) { manifest[element] = data }
     }
 
     // Update modules/manifest.json
@@ -49,14 +48,14 @@ async function uploadPage(id, element, frontmatter) {
         }})
         console.log("Updated", element)
     }
-    return res.data.page_id
+    return {id: res.data.page_id, url: `https://virtualvirginia.instructure.com/courses/${global.config.id}/pages/${res.data.url}` }
 }
 
 async function uploadAssignment(id, element, frontmatter) {
     const blob = (await read(global.paths.writeTo + '/' + element)).toString()
     const body = {
         "assignment[name]": frontmatter.title,
-        "assignment[description]": blob,
+        "assignment[description]": includebody ? blob : '',
         "assignment[submission_types][]": frontmatter.submission_types? [...frontmatter.submission_types] : ["none"],
         "assignment[points_possible]": frontmatter.points_possible? frontmatter.points_possible : 0,
         "assignment[grading_type]": frontmatter.grading_type? frontmatter.grading_type : "not_graded"
@@ -75,14 +74,14 @@ async function uploadAssignment(id, element, frontmatter) {
         }})
         console.log("Updated", element)
     }
-    return res.data.id
+    return {id: res.data.id, url: res.data.html_url }
 }
 
 async function uploadDiscussion(id, element, frontmatter) {
     const blob = (await read(global.paths.writeTo + '/' + element)).toString()
     const body = {
         "title": frontmatter.title,
-        "message": blob,
+        "message": includebody ? blob : '',
         "discussion_type": frontmatter.discussion_type? frontmatter.discussion_type : "threaded",
         "allow_rating": frontmatter.allow_rating? frontmatter.allow_rating : true,
         "require_initial_post": frontmatter.require_initial_post? frontmatter.require_initial_post : true
@@ -104,5 +103,5 @@ async function uploadDiscussion(id, element, frontmatter) {
         }})
         console.log("Updated", element)
     }
-    return res.data.id
+    return { id: res.data.id, url: res.data.html_url }
 }

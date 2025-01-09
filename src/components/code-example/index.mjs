@@ -1,6 +1,6 @@
 import {visit, SKIP} from 'unist-util-visit'
 import {h} from 'hastscript'
-import { getAssetId, getManifest } from '../../api/upload.mjs';
+import { getAssetId } from '../../api/upload.mjs';
 
 let count = 0 // Keep track of how many code-example elements we've rendered to avoid id collision in tabs
 

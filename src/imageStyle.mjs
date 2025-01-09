@@ -1,5 +1,4 @@
 import {visit} from 'unist-util-visit'
-import { getManifest } from './api/upload.mjs'
 
 export default function rehypeImageStyle(options) {
     return (tree) => {
@@ -14,7 +13,7 @@ export default function rehypeImageStyle(options) {
                     let id = node.properties.src
                     // console.log("Manifest image info", options.manifest[id])
                     if(options.manifest[id]) {
-                        id = options.manifest[id]
+                        id = options.manifest[id].id
                     } else {
                         filesNotUploaded.push(node.properties.src)
                     }
