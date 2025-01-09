@@ -15,7 +15,7 @@ export async function uploadAssets(path) {
     }
 
     // generate assets/manifest.json
-    await generateManifest(path)
+    global.manifest.assets = await generateManifest(path)
 }
 
 export async function uploadFile(filePath) {
@@ -86,4 +86,17 @@ async function generateManifest(assetsPath) {
     } catch (err) {
         console.log(err);
     }
+    return info
+}
+
+export function getAssetId(src, manifest) {
+    // Get image ID from assets/manifest.yaml
+    let id = src
+    console.log(manifest)
+    if(manifest[id]) {
+        id = manifest[id]
+    } else {
+        console.log(`\nWarning! Could not find asset ID for ${id} in assets/manifest.json`)
+    }
+    return id
 }

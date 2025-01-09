@@ -94,6 +94,7 @@ function getDirectoriesInPath(path) {
         aggregate += ("/" + folder)
         dirs.push(aggregate.substring(1))
     }
+    dirs = dirs.length == 1 && dirs[0].length == 0? [] : dirs
     return dirs
 }
 

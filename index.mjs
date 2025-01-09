@@ -7,6 +7,7 @@ import * as commander from 'commander'
 import { renderElements } from './src/element-renderer/index.mjs'
 import { deleteBuildDirDialogue } from './src/dialogues/deleteBuildDir.mjs'
 import { handleAssets, handleElements } from './src/dialogues/handleMissing.mjs'
+import { getManifest } from './src/api/upload.mjs'
 
 main()
 const questions = [
@@ -69,7 +70,7 @@ async function main() {
     //     .description("Test your API key to ensure you can authenticate against Canvas using polyscribe.")
     
     program.parse()
-    console.log(options)
+    // console.log(options)
 
     // Get paths TODO: better handling for non-standard path choices
     global.paths = {
@@ -78,8 +79,12 @@ async function main() {
         writeTo: getAbsolutePath(options.build.replace('./', command.args[0] + '/')),
         assets: getAbsolutePath(options.assets.replace('./', command.args[0] + '/'))
     }
+    global.manifest = {
+        assets: await getManifest(global.paths.assets),
+        modules: await getManifest(global.paths.root + "/modules")
+    }
 
-    console.log(global.paths)
+    // console.log(global.paths)
 
     // Get configuration
     global.config = await readYAML(global.paths.root + '/config.yaml')
@@ -110,7 +115,7 @@ async function main() {
     }
 
     // Step 1: Check to make sure the build directory doesn't already exist, then render the files specified by the selected options
-    await deleteBuildDirDialogue(global.paths.writeTo)
+    await deleteBuildDirDialogue(global.paths.writeTo, false)
     let renderReport = await renderElements(global.paths.readFrom, global.paths.writeTo)
 
     // Step 2: TODO: Check the settings in `config.yaml` to make sure everything is valid & authentication works

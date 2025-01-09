@@ -6,7 +6,7 @@ const questions = [
         name: "delete",
         type: "confirm",
         message: "The build directory already exists! Would you like to delete it and proceed with rendering?",
-        default: false
+        default: true
     }
 ]
 
