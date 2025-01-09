@@ -31,6 +31,7 @@ import rehypePrism from 'rehype-prism-plus'
 import { ImageAside } from '../components/image-aside/index.mjs'
 import { getManifest } from '../api/upload.mjs'
 // const YouTube = (properties, children) =>
+import { fileURLToPath } from 'url';
   
 
 async function renderFile(path) {
@@ -76,7 +77,7 @@ async function renderFile(path) {
     })
     .use(rehypePrism)
     .use(rehypeDocument, {
-        css: './src/main.css'
+        css: path.resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/main.css')
     })
     .use(rehypeInline, {
         js: false,
