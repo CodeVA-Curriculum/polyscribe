@@ -10,14 +10,14 @@ const questions = [
     }
 ]
 
-export async function deleteBuildDirDialogue(writeTo) {
+export async function deleteBuildDirDialogue(writeTo, override) {
     if(!fs.existsSync(writeTo)) {
         fs.mkdirSync(writeTo)
         return
     }
     console.log("")
-    const response = await inquirer.prompt(questions)
-    if(response.delete) {
+    const response = !override? await inquirer.prompt(questions) : override
+    if(response.delete || override) {
         fs.rmSync(writeTo, { recursive: true, force: true });
         console.log(`The build directory ${writeTo} has been deleted! Proceeding with render job...\n`)
         fs.mkdirSync(writeTo)

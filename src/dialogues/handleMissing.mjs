@@ -38,9 +38,11 @@ export async function handleAssets(path) {
 export async function handleElements(path, missingElements, frontmatters) {
     const response = await inquirer.prompt(elementHandling)
     if(response.uploadElements) {
+        console.log("")
         await uploadElements(path, missingElements, frontmatters)
+        console.log("\nFinished!")
     } else {
-        console.log("Skipping element upload...")
+        console.log("\nSkipping element upload...")
     }
     return response.uploadElements
 }

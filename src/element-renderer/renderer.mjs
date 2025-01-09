@@ -32,6 +32,7 @@ import { ImageAside } from '../components/image-aside/index.mjs'
 import { getManifest } from '../api/upload.mjs'
 // const YouTube = (properties, children) =>
 import { fileURLToPath } from 'url';
+import pathUtil from 'node:path'
   
 
 async function renderFile(path) {
@@ -40,6 +41,7 @@ async function renderFile(path) {
         assetsNotInManifest: []
     }
     let frontmatter = { title: "No Title!" }
+    console.log("Using styles at", pathUtil.resolve(fileURLToPath(new URL('.', import.meta.url)), 'main.css'))
     const html = await unified()
     .use(remarkParse)
     .use(remarkGfm)
@@ -77,7 +79,7 @@ async function renderFile(path) {
     })
     .use(rehypePrism)
     .use(rehypeDocument, {
-        css: path.resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/main.css')
+        css: pathUtil.resolve(fileURLToPath(new URL('.', import.meta.url)), 'main.css')
     })
     .use(rehypeInline, {
         js: false,

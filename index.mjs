@@ -120,7 +120,10 @@ async function main() {
     
     // Step 3: Ask user for next steps:
     const res = await handleAssets(global.paths.assets)
-    if(res) { renderReport = await deleteBuildDirDialogue(global.paths.writeTo); await renderElements(global.paths.readFrom, global.paths.writeTo) }
+    if(res) { 
+        await deleteBuildDirDialogue(global.paths.writeTo, true)
+        renderReport = await renderElements(global.paths.readFrom, global.paths.writeTo)
+    }
     
     console.log(`\nRendered ${renderReport.numberOfFilesRendered} files to ${global.paths.writeTo}`)
     console.log(`   Found ${renderReport.assetsNotInManifest.length} assets not in assets/manifest.json`)
