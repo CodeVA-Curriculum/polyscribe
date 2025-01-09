@@ -5,9 +5,10 @@ import {fromParse5} from 'hast-util-from-parse5'
 import {visit, SKIP} from 'unist-util-visit'
 import {toHtml} from 'hast-util-to-html'
 import {fromHtml} from 'hast-util-from-html'
+import { processRelativePath } from '../../../utils.mjs'
 
 const CodeExample = (properties, children) => {
-    const file = readSync('./src/components/code-example/index.html')
+    const file = readSync(processRelativePath('./src/components/code-example/index.html'))
     let blob = String(file)
     // TODO: import course ID from CLI
     blob = blob.replace("{{ imageURL }}", `https://canvas.instructure.com/courses/13038/files/${properties.src}/preview`)

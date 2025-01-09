@@ -41,7 +41,6 @@ async function renderFile(path) {
         assetsNotInManifest: []
     }
     let frontmatter = { title: "No Title!" }
-    console.log("Using styles at", pathUtil.resolve(fileURLToPath(new URL('.', import.meta.url)), 'main.css'))
     const html = await unified()
     .use(remarkParse)
     .use(remarkGfm)

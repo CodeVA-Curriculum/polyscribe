@@ -4,6 +4,8 @@ import axios from 'axios'
 import {read, write} from 'to-vfile'
 import FormData from 'form-data'
 import YAML from 'yaml'
+import pathUtil from 'node:path'
+import { fileURLToPath } from 'url'
 
 function getAbsolutePath(relativePath) {
     let absolutePath = relativePath
@@ -95,4 +97,9 @@ function getDirectoriesInPath(path) {
     return dirs
 }
 
-export {getAbsolutePath, getFiles, request, getFileId, readYAML, getDirectoriesInPath}
+function processRelativePath(rpath) {
+    const processed = rpath.substring(2)
+    return pathUtil.resolve(fileURLToPath(new URL('.', import.meta.url)), processed)
+}
+
+export {getAbsolutePath, getFiles, request, getFileId, readYAML, getDirectoriesInPath, processRelativePath}

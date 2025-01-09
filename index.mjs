@@ -79,6 +79,8 @@ async function main() {
         assets: getAbsolutePath(options.assets.replace('./', command.args[0] + '/'))
     }
 
+    console.log(global.paths)
+
     // Get configuration
     global.config = await readYAML(global.paths.root + '/config.yaml')
     const s = await readYAML(global.paths.root + '/secret.yaml')

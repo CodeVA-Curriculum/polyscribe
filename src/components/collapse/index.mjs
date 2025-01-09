@@ -5,11 +5,12 @@ import {fromParse5} from 'hast-util-from-parse5'
 import {visit, SKIP} from 'unist-util-visit'
 import {toHtml} from 'hast-util-to-html'
 import {fromHtml} from 'hast-util-from-html'
+import { processRelativePath } from '../../../utils.mjs'
 
 let count = 0;
 
 const Collapse = (properties, children) => {
-    const file = readSync('./src/components/collapse/index.html')
+    const file = readSync(processRelativePath('./src/components/collapse/index.html'))
     let blob = String(file)
     blob = blob.replace("{{ title }}", properties.title)
     blob = blob.replace("{{ count }}", count)
