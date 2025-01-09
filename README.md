@@ -269,7 +269,6 @@ void draw() {
 }
 ```
 :::
-```
 
 ![A screenshot of the :::code-example directive as it appears on Canvas](docs/code-example-notabs.png)
 
