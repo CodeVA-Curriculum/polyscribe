@@ -351,5 +351,17 @@ class Tree {
 
 ![A screenshot of the :::code-example directive with tabs as it appears on Canvas](docs/code-example-tabs.png)
 
+---
+
+#### The `::nsf` Directive
+
+The `::nsf` directive renders a callout crediting the NSF for funding a related work. Here's an example:
+
+```
+::nsf[00000000]
+```
+
+The project number gets passed between the `[` and `]` brackets. Make sure you add a file called `nsf.png` to `assets/` so the tool can insert the correct logo with the callout.
+
 Each fenced code snippet should be preceded by a `::name` directive. The text passed to the `[]` after the directive sets the text displayed in each tab.
 
