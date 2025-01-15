@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url'
 
 function getAbsolutePath(relativePath) {
     let absolutePath = relativePath
-    if(relativePath.includes('./') || relativePath.includes('../')) {
+    if(relativePath.includes('./') || relativePath.includes('../') || relativePath == '.') {
         absolutePath = path.resolve(relativePath).replace('polyscribe-canvas/', '')
     }
     return absolutePath
@@ -91,8 +91,10 @@ function getDirectoriesInPath(path) {
     let dirs = []
     let aggregate = ""
     for(const folder of folders) {
-        aggregate += ("/" + folder)
-        dirs.push(aggregate.substring(1))
+        if(folder.length > 0) {
+            aggregate += ("/" + folder)
+            dirs.push(aggregate.substring(1))
+        }
     }
     dirs = dirs.length == 1 && dirs[0].length == 0? [] : dirs
     return dirs

@@ -31,23 +31,21 @@ export async function renderElements(readFrom, writeTo) {
     // Render the files
     for(const file of files) {
         // Render the file
-        console.log("Rendering", file)
+        
         const {output, report, frontmatter} = await renderFile(file)
 
         let cleanFile =file.replace(readFrom, '').replace('.md', '.html').substring(1)
+        console.log("Rendering", cleanFile)
+        // console.log(cleanFile, readFrom)
         if(!(readFrom == global.paths.root + '/modules')) {
             const append = readFrom.replace(global.paths.root + '/modules/', '')   
             cleanFile = append + "/" + cleanFile
         }
 
         // Create directorie(s) for new file
-        // console.log(global.paths)
-        // console.log("Getting directories from", cleanFile.replace(global.paths.readFrom, ''))
-        const requiredDirs = getDirectoriesInPath(cleanFile.replace(global.paths.readFrom, ''))
-        console.log(cleanFile, requiredDirs)
+        const requiredDirs = getDirectoriesInPath(cleanFile)
         for(const dir of requiredDirs) {
             if(!dirs.includes(dir)) {
-                console.log(`Writing to ${writeTo + '/' + dir}`)
                 fs.mkdirSync(writeTo + '/' + dir)
                 dirs.push(dir)
             }
