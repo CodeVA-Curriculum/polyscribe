@@ -41,6 +41,7 @@ export async function renderElements(readFrom, writeTo) {
         }
 
         // Create directorie(s) for new file
+        console.log("Getting directories from", cleanFile.replace(global.paths.root, ''))
         const requiredDirs = getDirectoriesInPath(cleanFile.replace(global.paths.root, ''))
         console.log(cleanFile, requiredDirs)
         for(const dir of requiredDirs) {
