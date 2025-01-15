@@ -42,6 +42,7 @@ export async function renderElements(readFrom, writeTo) {
 
         // Create directorie(s) for new file
         const requiredDirs = getDirectoriesInPath(cleanFile)
+        console.log(cleanFile, requiredDirs)
         for(const dir of requiredDirs) {
             if(!dirs.includes(dir)) {
                 fs.mkdirSync(writeTo + '/' + dir)
