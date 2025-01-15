@@ -1,6 +1,7 @@
 import axios from "axios"
 import { read } from "to-vfile"
 import fs from 'fs'
+import { getDirectoriesInPath, getFullElementPath, processRelativePath } from "../../utils.mjs"
 
 // Supported element types
 const types = {
@@ -55,7 +56,7 @@ async function uploadAssignment(id, element, frontmatter) {
     const blob = (await read(global.paths.writeTo + '/' + element)).toString()
     const body = {
         "assignment[name]": frontmatter.title,
-        "assignment[description]": includebody ? blob : '',
+        "assignment[description]": blob,
         "assignment[submission_types][]": frontmatter.submission_types? [...frontmatter.submission_types] : ["none"],
         "assignment[points_possible]": frontmatter.points_possible? frontmatter.points_possible : 0,
         "assignment[grading_type]": frontmatter.grading_type? frontmatter.grading_type : "not_graded"
@@ -81,11 +82,22 @@ async function uploadDiscussion(id, element, frontmatter) {
     const blob = (await read(global.paths.writeTo + '/' + element)).toString()
     const body = {
         "title": frontmatter.title,
-        "message": includebody ? blob : '',
+        "message": blob,
         "discussion_type": frontmatter.discussion_type? frontmatter.discussion_type : "threaded",
         "allow_rating": frontmatter.allow_rating? frontmatter.allow_rating : true,
         "require_initial_post": frontmatter.require_initial_post? frontmatter.require_initial_post : true
     }
+    // let assignmentPath = frontmatter.assignment ? frontmatter.assignment.replace('.md', '.html') : false
+    // // Get the real path
+    // if(assignmentPath) {
+    //     assignmentPath = 
+    //     assignmentPath = assignmentPath.includes('./') ? getFullElementPath(element, assignmentPath) : assignmentPath
+    //     const assignment_id = global.manifest.modules[assignmentPath].id
+    //     if(assignment_id) { 
+    //         body.assignment_id = assignment_id
+    //         console.log(`Associated discussion at ${element} with assignment with ID ${assignment_id}!`)
+    //     }
+    // }
     if(frontmatter.assignment) {
         body.assignment = frontmatter.assignment
     }

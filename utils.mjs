@@ -103,4 +103,14 @@ function processRelativePath(rpath) {
     return pathUtil.resolve(fileURLToPath(new URL('.', import.meta.url)), processed)
 }
 
-export {getAbsolutePath, getFiles, request, getFileId, readYAML, getDirectoriesInPath, processRelativePath}
+// Returns the path relative to `modules` of an element given its relative path
+function getFullElementPath(hostPath, rpath) {
+    const dirs = getDirectoriesInPath(hostPath)
+    let path = rpath.replace('./', '')
+    for(const dir of dirs) {
+        path = dir + '/' + path
+    }
+    return path
+}
+
+export {getAbsolutePath, getFiles, request, getFileId, readYAML, getDirectoriesInPath, processRelativePath, getFullElementPath}

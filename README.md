@@ -191,7 +191,7 @@ When creating assignments, use frontmatter fields to configure assignment settin
 
 | Field              | Type     | Required? | Default        | Allowed Values |
 | ------------------ | -------- | --------- | -------------- | -------------- |
-| `submission_types` | `array`  | ❌        | `[ "none" ]`   | `online_quiz`, `none`, `on_paper`, `discussion_topic`, `online_upload`, `online_text_entry`, `online_url` |
+| `submission_types` | `array`  | ❌        | `[ "none" ]`   | `online_quiz`, `none`, `on_paper`, `online_upload`, `online_text_entry`, `online_url` |
 | `points_possible`  | `number` | ❌        | `0`            | any positive number (or zero) |
 | `grading_type`     | `string` | ❌        | `"not_graded"` | `pass_fail`, `percent`, `letter_grade`, `gpa_scale`, `points`, `not_graded` |
 
@@ -204,7 +204,22 @@ When creating discussion boards, use frontmatter fields to configure discussion 
 | `discussion_type`      | `string`  | ❌        | `threaded`     | `side_comment`, `threaded`, `not_threaded` |
 | `allow_rating`         | `boolean` | ❌        | `true`         | `true`, `false` |
 | `require_initial_post` | `boolean` | ❌        | `true`         | `true`, `false` |
-| `assignment`           | `object`  | ❌        | `null`         | See `assignment` frontmatter for values |
+| `assignment`           | `object`  | ❌        | `null`         | See `points_possible` and `grading_type` from "Assignment Frontmatter" above |
+
+Discussions can be ungraded or graded. To make them graded, you must pass assignment details to the `assignment` frontmatter field. Here's an example of a graded discussion element:
+
+```md
+---
+title: Graded Discussion Topic
+type: discussion
+assignment:
+    points_possible: 10
+    grading_type: pass_fail
+require_initial_post: false
+---
+
+A graded discussion board!
+```
 
 ### Directives
 
