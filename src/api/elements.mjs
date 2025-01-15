@@ -57,10 +57,19 @@ async function uploadAssignment(id, element, frontmatter) {
     const body = {
         "assignment[name]": frontmatter.title,
         "assignment[description]": blob,
-        "assignment[submission_types][]": frontmatter.submission_types? [...frontmatter.submission_types] : ["none"],
         "assignment[points_possible]": frontmatter.points_possible? frontmatter.points_possible : 0,
         "assignment[grading_type]": frontmatter.grading_type? frontmatter.grading_type : "not_graded"
     }
+    let submission_types;
+    if(frontmatter.submission_types) {
+        if(typeof(frontmatter.submission_types) == typeof('string')) {
+            submission_types = frontmatter.submission_types
+        } else {
+            submission_types = [...frontmatter.submission_types]
+        }
+    }
+    body["assignment[submission_types][]"] = submission_types
+
     let res
     if(!id) {
         res = await axios.post(`https://virtualvirginia.instructure.com/api/v1/courses/${global.config.id}/assignments`, body, { headers: {
