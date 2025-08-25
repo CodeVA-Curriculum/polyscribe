@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url'
 function getAbsolutePath(relativePath) {
     let absolutePath = relativePath
     if(relativePath.includes('./') || relativePath.includes('../') || relativePath == '.') {
-        absolutePath = path.resolve(relativePath).replace('polyscribe-canvas/', '')
+        absolutePath = path.resolve(relativePath).replace('polyscribe/', '')
     }
     return absolutePath
 }

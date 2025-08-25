@@ -15,6 +15,7 @@ const Collapse = (properties, children) => {
     blob = blob.replace("{{ title }}", properties.title)
     blob = blob.replace("{{ count }}", count)
     blob = blob.replace("{{ count }}", count)
+    blob = blob.replace("{{ count }}", count)
     count = count + 1;
     
     // Convert children to plaintext

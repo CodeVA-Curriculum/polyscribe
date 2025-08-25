@@ -18,7 +18,7 @@ export async function uploadAssets(path) {
     console.log('')
 
     // generate assets/manifest.json
-    global.manifest.assets = await generateManifest(path)
+    // global.manifest.assets = await generateManifest(path)
 }
 
 export async function uploadFile(filePath) {
