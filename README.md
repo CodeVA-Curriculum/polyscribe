@@ -1,4 +1,4 @@
-# `polyscribe-canvas`
+# `polyscribe`
 
 This tool is designed to consume a plain-text version of a Canvas course, and render that course on the Canvas website via the Canvas API. This allows course authors to develop courses using their choice of drafting tool, and manage course updates using version control software.
 
