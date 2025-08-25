@@ -6,7 +6,9 @@
   "author": "Jon Stapleton <stapleton.jon.michael@gmail.com>",
   "license": "MIT",
   "type": "module",
-  "bin": "./index.mjs",
+  "bin": {
+    "polyscribe": "./index.mjs"
+  },
   "dependencies": {
     "axios": "^1.7.9",
     "commander": "^13.0.0",

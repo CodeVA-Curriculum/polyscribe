@@ -70,13 +70,13 @@ const CodeExample = (properties, children) => {
     
     if(addImage) {
         // const src = properties.src.includes('http') ? properties.src : `https://canvas.instructure.com/courses/${global.config.id}/files/${properties.src}/preview`
-        let src
-        if(properties.src.includes('http')) {
-            src = properties.src
-        } else {
-            let id = getAssetId(properties.src, global.manifest.assets)
-            src = `https://canvas.instructure.com/courses/${global.config.id}/files/${id}/preview`
-        }
+        let src = "assets/"+properties.src.replace('./', '')
+        // if(properties.src.includes('http')) {
+        //     src = properties.src
+        // } else {
+        //     let id = getAssetId(properties.src, global.manifest.assets)
+        //     src = `https://canvas.instructure.com/courses/${global.config.id}/files/${id}/preview`
+        // }
         const img = h('.code-example-image-wrapper',[
             h('img.code-example-image', {src:src, alt: properties.alt})
         ])

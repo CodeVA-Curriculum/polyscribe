@@ -2,17 +2,16 @@
 
 This tool is designed to consume a plain-text version of a Canvas course, and render that course on the Canvas website via the Canvas API. This allows course authors to develop courses using their choice of drafting tool, and manage course updates using version control software.
 
-Please review [this sample course repository](https://github.com/CodeVA-Curriculum/polyscribe-canvas/tree/main/docs/sample-course) for a complete example of a course repository designed to be processed by `polyscribe-canvas`.
+Please review [this sample course repository](https://github.com/CodeVA-Curriculum/polyscribe-canvas/tree/main/docs/sample-course) for a complete example of a course repository designed to be processed by `polyscribe`.
 
 ## Course Structure
 
-The `polyscribe-canvas` tool expects course content to be organized accordingly:
+The `polyscribe` tool expects course content to be organized accordingly:
 
 ```
 assets/
 modules/
 config.yaml
-secret.yaml*
 ```
 
 *\*Do not stage or commit `secret.yaml`; be sure to add it to `.gitignore` to avoid publishing your Canvas API token*

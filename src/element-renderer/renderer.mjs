@@ -37,8 +37,7 @@ import auditAnchors from '../plugins/auditAnchors.mjs'
 
 async function renderFile(path) {
     const report = {
-        assetsNotInManifest: [],
-        anchorsNotInManifest: []
+        assets: []
     }
     let frontmatter = { title: "No Title!" }
     let html = await unified()
@@ -81,12 +80,12 @@ async function renderFile(path) {
     .use(remarkRehype, {
         allowDangerousHtml: true
     })
-    .use(auditAnchors, {
-        cb: (anchors) => report.anchorsNotInManifest = [...report.anchorsNotInManifest, ...anchors],
-        manifest: global.manifest.modules,
-        frontmatter: frontmatter,
-        path: path
-    })
+    // .use(auditAnchors, {
+    //     cb: (anchors) => report.anchorsNotInManifest = [...report.anchorsNotInManifest, ...anchors],
+    //     manifest: global.manifest.modules,
+    //     frontmatter: frontmatter,
+    //     path: path
+    // })
     .use(rehypeComponents, {
       components: {
             'youtube': YouTube,
@@ -115,11 +114,11 @@ async function renderFile(path) {
         svgElements: false,
     })
     .use(rehypeImageStyle, {
-        cb: (assets) => report.assetsNotInManifest = [...report.assetsNotInManifest, ...assets],
-        manifest: global.manifest.assets
+        cb: (assets) => report.assets = [...report.assets, ...assets],
+        parentDir: path
     })
     .use(rehypeInjectStyles)
-    .use(rehypeDecapitate)
+    // .use(rehypeDecapitate)
     .use(rehypeCanvasWrapper)
     .use(rehypeFormat)
     .use(rehypeStringify, {

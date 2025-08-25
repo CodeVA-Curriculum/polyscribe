@@ -8,7 +8,7 @@ export async function renderElements(readFrom, writeTo) {
     let summary = {
         rendered: [],
         numberOfFilesRendered: 0,
-        assetsNotInManifest: [],
+        assets: [],
         anchorsNotInManifest: [],
         elementsNotInManifest: [],
         frontmatters: {},
@@ -53,8 +53,8 @@ export async function renderElements(readFrom, writeTo) {
         
         summary.rendered.push(cleanFile)
         summary.numberOfFilesRendered++
-        summary.assetsNotInManifest = [...summary.assetsNotInManifest, ...report.assetsNotInManifest]
-        summary.anchorsNotInManifest = [...summary.anchorsNotInManifest, ...report.anchorsNotInManifest]
+        summary.assets = [...summary.assets, ...report.assets]
+        // summary.anchorsNotInManifest = [...summary.anchorsNotInManifest, ...report.anchorsNotInManifest]
         summary.frontmatters[cleanFile] = frontmatter
         summary.toWrite = [...summary.toWrite, {
             path: writeTo + "/" + cleanFile,
@@ -68,13 +68,13 @@ export async function renderElements(readFrom, writeTo) {
     }
 
     // Check `modules/manifest.json` for files that don't have IDs assigned yet & add them to the report
-    const manifest = global.manifest.modules
-    for(const file of summary.rendered) {
-        // console.log(file)
-        if(!manifest[file]) {
-            summary.elementsNotInManifest.push(file)
-        }
-    }
+    // const manifest = global.manifest.modules
+    // for(const file of summary.rendered) {
+    //     // console.log(file)
+    //     if(!manifest[file]) {
+    //         summary.elementsNotInManifest.push(file)
+    //     }
+    // }
 
     // console.log("Summary:", summary)
     return summary

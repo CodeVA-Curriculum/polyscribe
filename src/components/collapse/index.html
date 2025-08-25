@@ -1,6 +1,6 @@
-<h4><span class="element_toggler btn btn-primary" role="button" aria-controls="instructions{{ count }}" aria-label="Toggler toggle list visibility" aria-expanded="false">{{ title }}</span></h4>
-<ul id="instructions{{ count }}" style="list-style: none; display: none;">
-    <li>
-        {{ children }}
-    </li>
-</ul>
+<div class="collapsible-section">
+    <span onclick="ShowHide(instructions{{ count }})" class="btn btn-primary" role="button" aria-controls="instructions{{ count }}" aria-label="Toggler toggle list visibility" aria-expanded="false">{{ title }}</span></h4>
+    <div id="instructions{{ count }}" style="list-style: none; display: none;">
+            {{ children }}
+    </div>
+</div>

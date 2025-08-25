@@ -44,7 +44,7 @@ async function main() {
     
     program
         .name('polyscribe-canvas')
-        .description('CLI to render Canvas modules')
+        .description('CLI to render Moodle modules')
         .version('0.2.1');
     
     program.command('render')
@@ -77,7 +77,7 @@ async function main() {
     // This is an absolute mess
     global.paths = {
         root: getAbsolutePath(command.args[0]),
-        readFrom: getAbsolutePath(options.path == './modules' ? options.path.replace('./', command.args[0] + '/') : options.path),
+        readFrom: getAbsolutePath(options.path.replace('./', command.args[0] + '/')),
         writeTo: getAbsolutePath(options.build.replace('./', command.args[0] + '/')),
         assets: getAbsolutePath(options.assets.replace('./', command.args[0] + '/'))
     }
@@ -85,38 +85,38 @@ async function main() {
     // console.log(global.paths)
 
     // Get configuration
-    global.config = await readYAML(global.paths.root + '/config.yaml')
-    const s = await readYAML(global.paths.root + '/secret.yaml')
-    global.secret = s.token
+    // global.config = await readYAML(global.paths.root + '/config.yaml')
+    // const s = await readYAML(global.paths.root + '/secret.yaml')
+    // global.secret = s.token
 
     // Step 0: Validate prerequisite settings
     if(global.paths.readFrom == global.paths.writeTo) { throw new Error("The 'write' directory cannot be the same as the 'read' directory! Try again.") }
 
     // Generate element manifest if it doesn't exist
-    if(!fs.existsSync(global.paths.root + "/modules/manifest.json")) {
-        console.log("Element manifest not found, generating blank manifest...")
-        try {
-            fs.writeFileSync(`${global.paths.root}/modules/manifest.json`, "{}");
-        } catch (err) {
-            throw new Error(err)
-        }
-    }
+    // if(!fs.existsSync(global.paths.root + "/modules/manifest.json")) {
+    //     console.log("Element manifest not found, generating blank manifest...")
+    //     try {
+    //         fs.writeFileSync(`${global.paths.root}/modules/manifest.json`, "{}");
+    //     } catch (err) {
+    //         throw new Error(err)
+    //     }
+    // }
 
-    // Generate assets manifest if it doesn't exist
-    if(!fs.existsSync(global.paths.root + "/assets/manifest.json")) {
-        console.log("Asset manifest not found, generating blank manifest...")
-        try {
-            fs.writeFileSync(`${global.paths.root}/assets/manifest.json`, "{}");
-        } catch (err) {
-            throw new Error("Could not generate asset manifest!")
-        }
-    }
+    // // Generate assets manifest if it doesn't exist
+    // if(!fs.existsSync(global.paths.root + "/assets/manifest.json")) {
+    //     console.log("Asset manifest not found, generating blank manifest...")
+    //     try {
+    //         fs.writeFileSync(`${global.paths.root}/assets/manifest.json`, "{}");
+    //     } catch (err) {
+    //         throw new Error("Could not generate asset manifest!")
+    //     }
+    // }
 
     // Crimes!
-    global.manifest = {
-        assets: await getManifest(global.paths.assets),
-        modules: await getManifest(global.paths.root + "/modules")
-    }
+    // global.manifest = {
+    //     assets: await getManifest(global.paths.assets),
+    //     modules: await getManifest(global.paths.root + "/modules")
+    // }
 
     // Check to make sure the build directory doesn't already exist, let the user delete it if it does
     await deleteBuildDirDialogue(global.paths.writeTo, false)
@@ -126,13 +126,16 @@ async function main() {
 
     // Step 3: Print a report showing:
     console.log(`\nRendered ${renderReport.numberOfFilesRendered} files`)
-    console.log(`   Found ${renderReport.assetsNotInManifest.length} assets not in assets/manifest.json`)
-    console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json`)
-    console.log(`   Found ${renderReport.anchorsNotInManifest.length} anchor elements pointing to pages not in modules/manifest.json\n`)
+    console.log(`Found ${renderReport.assets.length} assets`)
+    console.log(renderReport.assets)
+    // console.log(`   Found ${renderReport.elementsNotInManifest.length} elements not in modules/manifest.json`)
+    // console.log(`   Found ${renderReport.anchorsNotInManifest.length} anchor elements pointing to pages not in modules/manifest.json\n`)
+
+    // await copyAssets(renderReport.assets, global.paths.assets, global.paths.writeTo)
 
     // TODO: await displayReport(renderReport)
 
-    await handleAssets(global.paths.assets)
-    await handleElements(global.paths.writeTo, renderReport.rendered, renderReport.frontmatters)
+    // await handleAssets(global.paths.assets)
+    // await handleElements(global.paths.writeTo, renderReport.rendered, renderReport.frontmatters)
     
 }
