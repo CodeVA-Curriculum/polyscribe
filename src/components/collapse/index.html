@@ -1,6 +1,4 @@
-<div class="collapsible-section">
-    <span onclick="ShowHide(instructions{{ count }})" class="btn btn-primary" role="button" aria-controls="instructions{{ count }}" aria-label="Toggler toggle list visibility" aria-expanded="false">{{ title }}</span></h4>
-    <div id="instructions{{ count }}" style="list-style: none; display: none;">
-            {{ children }}
-    </div>
-</div>
+<details>
+    <summary style="margin: 1rem 0" role="button" class="btn btn-primary">{{ title }}</summary>
+    {{ children }}
+</details>

@@ -118,8 +118,8 @@ async function renderFile(path) {
         parentDir: path
     })
     .use(rehypeInjectStyles)
-    // .use(rehypeDecapitate)
-    .use(rehypeCanvasWrapper)
+    .use(rehypeDecapitate)
+    // .use(rehypeCanvasWrapper)
     .use(rehypeFormat)
     .use(rehypeStringify, {
         allowDangerousHtml: true
