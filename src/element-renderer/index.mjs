@@ -31,7 +31,7 @@ export async function renderElements(readFrom, writeTo) {
     // Render the files
     for(const file of files) {
         // Render the file
-        
+        // console.log("Preparing to render", file)
         const {output, report, frontmatter} = await renderFile(file)
 
         let cleanFile =file.replace(readFrom, '').replace('.md', '.html').substring(1)
