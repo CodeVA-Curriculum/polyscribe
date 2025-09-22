@@ -19,7 +19,7 @@ export default function rehypeImageStyle(options) {
                     // }
                     // console.log(`Image ID for ${node.properties.src} is ${id}`)
                     // node.properties.src=`https://virtualvirginia.instructure.com/courses/${global.config.id}/files/${id}/preview`
-                    node.properties.src='curriculum.codevirginia.org/content-repo/images/' + node.properties.src.replace('./', '')
+                    node.properties.src='https://curriculum.codevirginia.org/content-repo/images/' + node.properties.src.replace('./', '')
                     filesNotUploaded.push(node.properties.src)
                     // console.log("Updated image URL to", node.properties.src)
                 }
