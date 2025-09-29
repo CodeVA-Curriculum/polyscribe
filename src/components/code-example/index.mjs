@@ -21,7 +21,7 @@ const CodeExample = (properties, children) => {
 
     // Construct template hast
     const hast = h(`article.${wrapperClass}`, [
-        h('.enhanceable_content.tabs.tab-content', [...children])
+        ...children
     ])
 
     let tabElements = []
@@ -29,20 +29,30 @@ const CodeExample = (properties, children) => {
         // Find name, transform it into an <li> and add it to the `tabElements` list, remove from tree
         if(node.tagName == 'name' && properties.tabs) {
             // Transform into link, save node for later in `tabElements` list
-            node.tagName = 'a'
-            node.properties.href = `#fragment-${count}${tabElements.length+1}`
-            tabElements.push(h('li', [node]))
+            // node.tagName = 'button'
+            // node.properties.href = `#fragment-${count}${tabElements.length+1}`
+            if(tabElements.length == 0) {
+                tabElements.push(h('li.nav-item', { role: "presentation" }, [
+                    h('button.nav-link active', {"data-bs-toggle": "tab", "data-bs-target": `#fragment-${count}${tabElements.length}`, type: "button", role:"tab", "aria-controls": "profile", "aria-selected": "true" }, node.children)
+                ]))
+            } else {
+                tabElements.push(h('li.nav-item', { role: "presentation" }, [
+                    h('button.nav-link', {"data-bs-toggle": "tab", "data-bs-target": `#fragment-${count}${tabElements.length}`, type: "button", role:"tab", "aria-controls": "profile", "aria-selected": "false" }, node.children)
+                ]))
+            }
+            
 
             // Remove all the children preceding the `name` element, and add them back wrapped in the appropriate div
             const numberOfFollowingChildren = 1;
             const children = parent.children.splice(tabElements.length, numberOfFollowingChildren)
             // console.log(children)
-            const div = h(`#fragment-${count}${tabElements.length}`, [
-                ...children
-            ])
+            const div = 
+                h(`.tab-pane.fade.show${tabElements.length == 1? ".active" : ""}`, { role: 'tabpanel', id: `fragment-${count}${tabElements.length}` }, [
+                    ...children
+                ])
             parent.children.splice(tabElements.length, 0, div)
 
-            // Remove `name` node from tree
+            // // Remove `name` node from tree
             parent.children.splice(index, 1)
             return [SKIP, index]
         }
@@ -61,16 +71,16 @@ const CodeExample = (properties, children) => {
     // If we need to add tabs, add them back to the top of the tree
     if(properties.tabs) {
         // Construct `ul` element for tabs
-        const ul = h('ul.tabs-list', [
+        const ul = h('ul.nav.nav-tabs', { role: 'tablist' }, [
             ...tabElements
         ])
         // Add `ul` to hast
-        hast.children[0].children.splice(0, 0, ul)
+        hast.children.splice(0, 0, ul)
     }
     
     if(addImage) {
         // const src = properties.src.includes('http') ? properties.src : `https://canvas.instructure.com/courses/${global.config.id}/files/${properties.src}/preview`
-        let src = "assets/"+properties.src.replace('./', '')
+        let src = "https://curriculum.codevirginia.org/content-repo/images/"+properties.src.replace('./', '')
         // if(properties.src.includes('http')) {
         //     src = properties.src
         // } else {
